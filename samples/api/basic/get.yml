@@ -1,0 +1,21 @@
+-
+  # delay: 1000
+  status: 200
+
+  headers:
+    x-test: x/test
+
+  match:
+    headers:
+      x-test: blue
+    # query:
+    # body:
+    
+
+  body: |
+    users: 
+      - &user
+        id: 200
+        name: john doe
+      - <<: *user
+        id: 201
