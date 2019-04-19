@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
 const isMatch = require('lodash.ismatchwith')
-const isEqual = require('lodash.ismatchwith')
+const isEqual = require('lodash.isequalwith')
 
 /**
  * Determines if a particular mock exist in our mocks directory
@@ -35,7 +35,7 @@ function loadMocksConfig (filename) {
     docs = yaml.safeLoad(file)
     docs = Array.isArray(docs) ? docs : [docs]
   } catch (err) {
-    consolrr.error(err.message)
+    console.error(err.message)
   }
 
   return docs
@@ -44,15 +44,36 @@ function loadMocksConfig (filename) {
 function processMock (ctx, mock) {
   if (mock.status) ctx.status = mock.status
   if (mock.headers) ctx.set(mock.headers)
-  if (mock.body) ctx.body = mock.body
+  if (mock.response) ctx.body = mock.response
 }
 
-function requestMatchesMock (req, matches) {
+function requestMatchesMock (req, matchers) {
   // if there is nothing to verify its automatically a match
-  if (matches === undefined) return true
-  if (matches === false) return false
+  if (matchers === undefined) return true
+  if (matchers === false) return false
+  
+  // if any fail, its not a match
+  for (config in matchers) {
+    let [ section, ...modifiers ] = config.split('.')
 
-  // return isMatch(req.headers, matches.headers)
+    let match = true
+
+    // passed in values must match what we expect (no less, no more)
+    if (modifiers.includes('equal')) {
+      match = isEqual(req[section], matchers[config])
+    // just check that the keys are part of the request
+    } else if (modifiers.includes('has')) {
+      const keys = Array.isArray(matchers[config]) ? matchers[config] : [ matchers[config] ]
+      match = keys.every(key => key in req[section])
+    // partially match the request
+    } else {
+      match = isMatch(req[section], matchers[config])
+    }
+
+    if (!match) {
+      return false
+    }
+  }
 
   return true
 }

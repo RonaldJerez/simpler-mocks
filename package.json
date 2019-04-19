@@ -2,15 +2,16 @@
   "name": "simpler-mocks",
   "private": true,
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "./src",
   "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "PORT=8080 nodemon ./src"
   },
   "dependencies": {
     "js-yaml": "^3.13.1",
     "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
     "lodash.isequalwith": "^4.4.0",
