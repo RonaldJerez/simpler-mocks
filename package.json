@@ -5,8 +5,8 @@
   "main": "./src",
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "PORT=8080 nodemon ./src"
+    "test": "jest --watchAll --coverage",
+    "dev": "nodemon ./src"
   },
   "dependencies": {
     "js-yaml": "^3.13.1",

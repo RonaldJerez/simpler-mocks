@@ -14,7 +14,8 @@ const isEqual = require('lodash.isequalwith')
  * @return {String} the filename that matches this request
  */
 function getFileName (mocks, url, method) {
-  const filename = path.resolve(mocks, `.${url}`, `${method.toLowerCase()}.yml`)
+  const mainPath = path.dirname(require.main.filename)
+  const filename = path.resolve(mainPath, mocks, `.${url}.${method.toLowerCase()}.yml`)
 
   if (fs.existsSync(filename)) {
     return filename
@@ -35,6 +36,7 @@ function loadMocksConfig (filename) {
     docs = yaml.safeLoad(file)
     docs = Array.isArray(docs) ? docs : [docs]
   } catch (err) {
+    /* istanbul ignore next */
     console.error(err.message)
   }
 
@@ -84,7 +86,7 @@ function requestMatchesMock (req, matchers) {
  * @param {*} ms amount of time to delay in milliseconds
  * @retuns Promise 
  */
-function delay (ms = 0) {
+function delay (ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 

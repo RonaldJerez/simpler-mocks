@@ -43,20 +43,27 @@ router.all('*', async (ctx, next) => {
   await next()
 })
 
-app.use(logger())
 app.use(bodyParser())
 app.use(router.routes())
 app.use(router.allowedMethods())
 
-function server (mocks, port) {
+// defaulting the port to 0 allows the OS to select a random free port
+function server (mocks, port = process.env.PORT || 0, silent = false) {
   mocksDirectory = mocks
-  const thePort = port || process.env.PORT || 80
-  app.listen(thePort)
 
-  console.log(`Mock server running on:\thttp://localhost:${thePort}`)
+  // this is mainly to silence the logger during testing
+  if (!silent) {
+    app.use(logger())
+  }
+
+  const _server = app.listen(port)
+
+  console.log(`Mock server running on:\thttp://localhost:${_server.address().port}`)
+  return _server
 }
 
 // if this is the main app, run the server
+/* istanbul ignore next */
 if (require.main === module)
   server('./samples')
 
