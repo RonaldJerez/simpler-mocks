@@ -1,0 +1,32 @@
+- # regular json, application/json
+  match:
+    query:
+      type: json
+  response:
+    { some: ['json', 'content'] }
+
+- # yml to json, application/json
+  match:
+    query:
+      type: json2
+  response:
+    some:
+      - json
+      - content
+
+- # text/html
+  match:
+    query:
+      type: html
+  response: |
+    <html>
+      <body>test</body>
+    </html>
+
+- # text/plain
+  match:
+    query:
+      type: text
+  response: |
+    some simple text
+    

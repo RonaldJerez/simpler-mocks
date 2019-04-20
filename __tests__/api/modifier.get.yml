@@ -1,0 +1,12 @@
+-
+  match:
+    headers.has: x-has-single
+  status: 201
+
+-
+  match:
+    headers.has:
+      - x-has-one
+      - x-has-two
+  status: 202
+  
