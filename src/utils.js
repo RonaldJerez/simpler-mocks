@@ -6,14 +6,14 @@ const isEqual = require('lodash.isequalwith')
 
 /**
  * Determines if a particular mock exist in our mocks directory
- * 
- * @param {*} mocks 
- * @param {*} url 
- * @param {*} method 
- * 
+ *
+ * @param {*} mocks
+ * @param {*} url
+ * @param {*} method
+ *
  * @return {String} the filename that matches this request
  */
-function getFileName (mocks, url, method) {
+function getFileName(mocks, url, method) {
   const mainPath = path.dirname(require.main.filename)
   const filename = path.resolve(mainPath, mocks, `.${url}.${method.toLowerCase()}.yml`)
 
@@ -24,11 +24,11 @@ function getFileName (mocks, url, method) {
 
 /**
  * loads the mock config from the specified file
- * 
+ *
  * @param {*} filename the yml file with the mock config
  * @returns {Array}
  */
-function loadMocksConfig (filename) {
+function loadMocksConfig(filename) {
   let docs
   const file = fs.readFileSync(filename, 'utf8')
 
@@ -43,31 +43,31 @@ function loadMocksConfig (filename) {
   return docs
 }
 
-function processMock (ctx, mock) {
+function processMock(ctx, mock) {
   if (mock.status) ctx.status = mock.status
   if (mock.headers) ctx.set(mock.headers)
   if (mock.response) ctx.body = mock.response
 }
 
-function requestMatchesMock (req, matchers) {
+function requestMatchesMock(req, matchers) {
   // if there is nothing to verify its automatically a match
   if (matchers === undefined) return true
   if (matchers === false) return false
-  
+
   // if any fail, its not a match
   for (config in matchers) {
-    let [ section, ...modifiers ] = config.split('.')
+    let [section, ...modifiers] = config.split('.')
 
     let match = true
 
     // passed in values must match what we expect (no less, no more)
     if (modifiers.includes('equal')) {
       match = isEqual(req[section], matchers[config])
-    // just check that the keys are part of the request
+      // just check that the keys are part of the request
     } else if (modifiers.includes('has')) {
-      const keys = Array.isArray(matchers[config]) ? matchers[config] : [ matchers[config] ]
-      match = keys.every(key => key in req[section])
-    // partially match the request
+      const keys = Array.isArray(matchers[config]) ? matchers[config] : [matchers[config]]
+      match = keys.every((key) => key in req[section])
+      // partially match the request
     } else {
       match = isMatch(req[section], matchers[config])
     }
@@ -82,12 +82,12 @@ function requestMatchesMock (req, matchers) {
 
 /**
  * Resolves a promise in the amount of milliseconds specified
- * 
+ *
  * @param {*} ms amount of time to delay in milliseconds
- * @retuns Promise 
+ * @retuns Promise
  */
-function delay (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 module.exports = {
