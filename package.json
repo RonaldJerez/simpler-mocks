@@ -8,7 +8,8 @@
   },
   "author": "Ronald Jerez",
   "scripts": {
-    "test": "jest --watchAll --coverage",
+    "test": "jest",
+    "test:watch": "jest --watchAll --coverage",
     "dev": "nodemon ./src",
     "semantic-release": "semantic-release"
   },
