@@ -13,12 +13,11 @@ const SCHEMA_KEYS = {
 }
 
 /**
- * Determines if a particular mock exist in our mocks directory
+ * Determines if a particular mock exist in our mocks directory, based on the request URL and method
  *
- * @param {*} directory
- * @param {*} url
- * @param {*} method
- *
+ * @param {*} directory the directory where to search
+ * @param {*} url the request URL
+ * @param {*} method the request method used
  * @return {String} the filename that matches this request
  */
 function getFileName(directory, url, method) {
@@ -33,8 +32,8 @@ function getFileName(directory, url, method) {
 /**
  * loads the mock config from the specified file
  *
- * @param {*} filename the yml file with the mock config
- * @returns {Array}
+ * @param {*} filename the YAML file with the mock's config
+ * @returns {Array} an array containing the mock file definition(s)
  */
 function loadMockFile(filename) {
   let docs = []
@@ -54,7 +53,8 @@ function loadMockFile(filename) {
 /**
  * Checks if a given mock has some schema definition
  * 
- * @param {*} mock 
+ * @param {*} mock the mock file config
+ * @returns {boolean}
  */
 function mockHasSchema(mock) {
   if (Array.isArray(mock) || typeof mock === 'string') {
@@ -68,8 +68,8 @@ function mockHasSchema(mock) {
 /**
  * Responds to the request
  * 
- * @param {*} ctx 
- * @param {*} mock 
+ * @param {object} ctx Koa context object
+ * @param {*} mock the mock file config 
  */
 function respond(ctx, mock) {
   if (!mockHasSchema(mock)) {
@@ -85,8 +85,9 @@ function respond(ctx, mock) {
 /**
  * Checks if a given mock's conditions is met by the http request
  * 
- * @param {*} mock the mock definition to check
- * @param {*} req Koa's request object
+ * @param {*} mock the mock file config to check
+ * @param {object} req Koa's request object
+ * @returns {boolean}
  */
 function requestMeetsConditions(req, mock) {
   // abdance of conditions means the request matches the mock
@@ -125,10 +126,10 @@ function requestMeetsConditions(req, mock) {
 }
 
 /**
- * Resolves a promise in the amount of milliseconds specified
+ * Delay code exection by <ms> milleseconds 
  *
  * @param {*} ms amount of time to delay in milliseconds
- * @retuns Promise
+ * @retuns {Promise}
  */
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))

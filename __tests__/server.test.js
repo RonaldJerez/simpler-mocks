@@ -95,7 +95,7 @@ describe('Matcher modifiers', () => {
   )
 })
 
-describe('Non schema files', () => {
+describe('Non SCHEMA files', () => {
   test('General YAML', () => request(server)
     .get('/api/simple/yaml')
     .expect(200)
