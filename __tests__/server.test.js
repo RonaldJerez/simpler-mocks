@@ -96,15 +96,21 @@ describe('Matcher modifiers', () => {
 })
 
 describe('Non SCHEMA files', () => {
-  test('General YAML', () => request(server)
+  test('YAML files', () => request(server)
     .get('/api/simple/yaml')
     .expect(200)
     .expect('Content-Type', /application\/json/)
   )
 
-  test('General Text', () => request(server)
+  test('Plain text', () => request(server)
     .get('/api/simple/text')
     .expect(200)
     .expect('Content-Type', /text\/plain/)
+  )
+
+  test('JSON files', () => request(server)
+    .get('/api/simple/json')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
   )
 })

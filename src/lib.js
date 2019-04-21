@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const yaml = require('js-yaml')
+const globby = require('globby')
 const isMatch = require('lodash.ismatchwith')
 const isEqual = require('lodash.isequalwith')
 
@@ -15,17 +16,24 @@ const SCHEMA_KEYS = {
 /**
  * Determines if a particular mock exist in our mocks directory, based on the request URL and method
  *
- * @param {*} directory the directory where to search
+ * @param {*} mocksDirectory the directory where to mocks are located
  * @param {*} url the request URL
  * @param {*} method the request method used
  * @return {String} the filename that matches this request
  */
-function getFileName(directory, url, method) {
-  const cwd = path.dirname(require.main.filename)
-  const filename = path.resolve(cwd, directory, `.${url}.${method.toLowerCase()}.yml`)
+async function getFileName(mocksDirectory, url, method) {
+  // remove the leading '/', otherwise resolve will 
+  // make the path absolute from the value of url
+  url = url.substr(1)
 
-  if (fs.existsSync(filename)) {
-    return filename
+  const cwd = path.dirname(require.main.filename)
+  const fileName = `${url}.${method.toLowerCase()}.(yaml|yml|json)`
+  const filePath = path.resolve(cwd, mocksDirectory, fileName)
+
+  const files = await globby(filePath)
+
+  if (files.length) {
+    return files[0]
   }
 }
 

@@ -11,11 +11,11 @@ let mocksDirectory
 
 // catch all requests
 router.all('*', async (ctx, next) => {
-  const filename = lib.getFileName(mocksDirectory, ctx.path, ctx.method)
+  const fileName = await lib.getFileName(mocksDirectory, ctx.path, ctx.method)
 
-  if (filename) {
+  if (fileName) {
     let delay
-    const mocks = lib.loadMockFile(filename)
+    const mocks = lib.loadMockFile(fileName)
 
     mocks.some((mock) => {
       // Array.some short circuits when returning truthy
