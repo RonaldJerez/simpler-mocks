@@ -8,7 +8,7 @@ const utils = require('./utils')
 const app = new Koa()
 const router = new Router()
 
-let mocksDirectory = './'
+let mocksDirectory
 
 // catch all requests
 router.all('*', async (ctx, next) => {
@@ -50,24 +50,17 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 
 // defaulting the port to 0 allows the OS to select a random free port
-function server(mocks, port = process.env.PORT || 0, silent = false) {
-  mocksDirectory = mocks
+function server(directory = './', port = 0, silent = false) {
+  mocksDirectory = directory
 
-  // this is mainly to silence the logger during testing
   if (!silent) {
     app.use(logger())
   }
 
   const _server = app.listen(port)
 
-  console.log(`Mock server running on:\thttp://localhost:${_server.address().port}`)
+  console.log(`Mock server running on:\t\thttp://localhost:${_server.address().port}`)
   return _server
-}
-
-// if this is the main app, run the server
-/* istanbul ignore next */
-if (require.main === module) {
-  server('./samples')
 }
 
 module.exports = server

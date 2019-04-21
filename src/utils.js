@@ -7,15 +7,15 @@ const isEqual = require('lodash.isequalwith')
 /**
  * Determines if a particular mock exist in our mocks directory
  *
- * @param {*} mocks
+ * @param {*} directory
  * @param {*} url
  * @param {*} method
  *
  * @return {String} the filename that matches this request
  */
-function getFileName(mocks, url, method) {
-  const mainPath = path.dirname(require.main.filename)
-  const filename = path.resolve(mainPath, mocks, `.${url}.${method.toLowerCase()}.yml`)
+function getFileName(directory, url, method) {
+  const cwd = path.dirname(require.main.filename)
+  const filename = path.resolve(cwd, directory, `.${url}.${method.toLowerCase()}.yml`)
 
   if (fs.existsSync(filename)) {
     return filename

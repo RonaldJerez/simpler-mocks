@@ -1,19 +1,23 @@
 {
   "name": "simpler-mocks",
   "version": "0.0.0-development",
-  "main": "./src",
   "license": "MIT",
-  "engines": {
-    "node": ">=8.11.3"
-  },
   "author": "Ronald Jerez",
+  "main": "./src/server.js",
+  "bin": {
+    "simpler-mocks": "./src/cli.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watchAll --coverage",
-    "dev": "nodemon ./src",
+    "dev": "nodemon ./src/cli.js ./__tests__ --port 8080",
     "semantic-release": "semantic-release"
   },
   "dependencies": {
+    "argparse": "^1.0.10",
     "js-yaml": "^3.13.1",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",

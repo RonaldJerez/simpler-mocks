@@ -1,5 +1,5 @@
 const request = require('supertest');
-const Server = require('../src');
+const Server = require('../src/server');
 
 let server
 beforeAll(async () => {
