@@ -1,12 +1,12 @@
 -
-  match:
+  :conditions:
     headers.has: x-has-single
-  status: 201
+  :status: 201
 
 -
-  match:
+  :conditions:
     headers.has:
       - x-has-one
       - x-has-two
-  status: 202
+  :status: 202
   

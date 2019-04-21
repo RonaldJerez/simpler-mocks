@@ -1,18 +1,18 @@
 - # this mock has a matcher
-  match:
+  :conditions:
     query: 
       which: first
 
-  response:
+  :response:
     mock: first
 
-- # setting match to false should skip this mock
-  match: false
-  status: 200
+- # setting conditions to skip will skip this mock
+  :conditions: skip
+  :status: 200
 
 - # if nothing matches return this mock
-  status: 400
-  headers:
+  :status: 400
+  :headers:
     x-custom: custom header value
-  response:
+  :response:
     mock: fallback

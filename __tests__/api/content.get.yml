@@ -1,32 +1,32 @@
 - # regular json, application/json
-  match:
+  :conditions:
     query:
       type: json
-  response:
+  :response:
     { some: ['json', 'content'] }
 
 - # yml to json, application/json
-  match:
+  :conditions:
     query:
       type: json2
-  response:
+  :response:
     some:
       - json
       - content
 
 - # text/html
-  match:
+  :conditions:
     query:
       type: html
-  response: |
+  :response: |
     <html>
       <body>test</body>
     </html>
 
 - # text/plain
-  match:
+  :conditions:
     query:
       type: text
-  response: |
+  :response: |
     some simple text
     

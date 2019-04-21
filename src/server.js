@@ -1,41 +1,38 @@
-//app.js
 const Koa = require('koa')
 const Router = require('koa-router')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
-const utils = require('./utils')
+const { SCHEMA_KEYS, ...lib } = require('./utils')
 
 const app = new Koa()
 const router = new Router()
-
+ 
 let mocksDirectory
 
 // catch all requests
 router.all('*', async (ctx, next) => {
-  const filename = utils.getFileName(mocksDirectory, ctx.path, ctx.method)
+  const filename = lib.getFileName(mocksDirectory, ctx.path, ctx.method)
 
   if (filename) {
-    let delay = 0
-    const mocks = utils.loadMocksConfig(filename)
+    let delay
+    const mocks = lib.loadMockFile(filename)
 
     mocks.some((mock) => {
       // Array.some short circuits when returning truthy
       // and continues when returning falsy
-      if (!utils.requestMatchesMock(ctx.request, mock.match)) {
+      if (!lib.requestMeetsConditions(ctx.request, mock)) {
         return false
       }
 
       // delay must be done outside the loop otherwise it doesnt work
-      if (mock.delay) {
-        delay = mock.delay
-      }
+      delay = mock[SCHEMA_KEYS.delay] || 0
 
-      utils.processMock(ctx, mock)
+      lib.respond(ctx, mock)
       return true
     })
 
     if (delay) {
-      await utils.delay(delay)
+      await lib.delay(delay)
     }
 
     return
@@ -59,7 +56,7 @@ function server(directory = './', port = 0, silent = false) {
 
   const _server = app.listen(port)
 
-  console.log(`Mock server running on:\t\thttp://localhost:${_server.address().port}`)
+  console.log(`Mock server running on:\t http://localhost:${_server.address().port}`)
   return _server
 }
 

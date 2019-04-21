@@ -1,5 +1,5 @@
 -
-  match:
+  :conditions:
     body.equal:
       one: 1
-  status: 204
+  :status: 204

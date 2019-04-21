@@ -10,38 +10,40 @@ afterAll(() => {
   server.close();
 });
 
-test('non existing endpoint', () => request(server)
-  .get('/api/non/existant')
-  .expect(404)
-)
+describe('General', () => {
+  test('non existing endpoint', () => request(server)
+    .get('/api/non/existant')
+    .expect(404)
+  )
 
-test('endpoint with deeper path', () => request(server)
-  .get('/api/deep/endpoint')
-  .expect(201)
-)
+  test('endpoint with deeper path', () => request(server)
+    .get('/api/deep/endpoint')
+    .expect(201)
+  )
 
-test('reads documents with a single mock', () => request(server)
-  .get('/api/single')
-  .expect(200, { color: 'blue' })
-)
+  test('reads documents with a single mock', () => request(server)
+    .get('/api/single')
+    .expect(200, { color: 'blue' })
+  )
 
-test('reads documents with multiple mocks', () => request(server)
-  .get('/api/multi')
-  .expect(400, { mock: 'fallback' })
-  .expect('x-custom', 'custom header value')
-)
+  test('reads documents with multiple mocks', () => request(server)
+    .get('/api/multi')
+    .expect(400, { mock: 'fallback' })
+    .expect('x-custom', 'custom header value')
+  )
 
-test('pick the first mock that matches', () => request(server)
-  .get('/api/multi?which=first')
-  .expect({mock: 'first'})
-)
+  test('pick the first mock that matches', () => request(server)
+    .get('/api/multi?which=first')
+    .expect({mock: 'first'})
+  )
 
-test('mocks with delay setting should be delayed', async () => {
-  const start = Date.now()
-  await request(server).get('/api/delay')
-  const end = Date.now()
+  test('mocks with delay setting should be delayed', async () => {
+    const start = Date.now()
+    await request(server).get('/api/delay')
+    const end = Date.now()
 
-  expect(end - start).toBeGreaterThanOrEqual(200);
+    expect(end - start).toBeGreaterThanOrEqual(200);
+  })
 })
 
 describe('Response Content-Type', () => {
@@ -91,5 +93,18 @@ describe('Matcher modifiers', () => {
     .send({one: 1, two: 2})
     .expect(404)
   )
+})
 
+describe('Non schema files', () => {
+  test('General YAML', () => request(server)
+    .get('/api/simple/yaml')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+  )
+
+  test('General Text', () => request(server)
+    .get('/api/simple/text')
+    .expect(200)
+    .expect('Content-Type', /text\/plain/)
+  )
 })
