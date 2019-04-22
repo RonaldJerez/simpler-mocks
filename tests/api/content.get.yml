@@ -2,8 +2,7 @@
   :conditions:
     query:
       type: json
-  :response:
-    { some: ['json', 'content'] }
+  :response: { some: ['json', 'content'] }
 
 - # yml to json, application/json
   :conditions:
@@ -29,4 +28,3 @@
       type: text
   :response: |
     some simple text
-    

@@ -1,12 +1,9 @@
--
-  :conditions:
+- :conditions:
     headers.has: x-has-single
   :status: 201
 
--
-  :conditions:
+- :conditions:
     headers.has:
       - x-has-one
       - x-has-two
   :status: 202
-  

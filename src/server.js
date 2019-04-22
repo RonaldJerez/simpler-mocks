@@ -6,7 +6,7 @@ const { SCHEMA_KEYS, ...lib } = require('./lib')
 
 const app = new Koa()
 const router = new Router()
- 
+
 let mocksDirectory
 
 // catch all requests

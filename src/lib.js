@@ -22,7 +22,7 @@ const SCHEMA_KEYS = {
  * @return {String} the filename that matches this request
  */
 async function getFileName(mocksDirectory, url, method) {
-  // remove the leading '/', otherwise resolve will 
+  // remove the leading '/', otherwise resolve will
   // make the path absolute from the value of url
   url = url.substr(1)
 
@@ -60,7 +60,7 @@ function loadMockFile(filename) {
 
 /**
  * Checks if a given mock has some schema definition
- * 
+ *
  * @param {*} mock the mock file config
  * @returns {boolean}
  */
@@ -70,14 +70,14 @@ function mockHasSchema(mock) {
   }
 
   const keys = Object.values(SCHEMA_KEYS)
-  return Object.keys(mock).some(key => keys.includes(key))
+  return Object.keys(mock).some((key) => keys.includes(key))
 }
 
 /**
  * Responds to the request
- * 
+ *
  * @param {object} ctx Koa context object
- * @param {*} mock the mock file config 
+ * @param {*} mock the mock file config
  */
 function respond(ctx, mock) {
   if (!mockHasSchema(mock)) {
@@ -92,7 +92,7 @@ function respond(ctx, mock) {
 
 /**
  * Checks if a given mock's conditions is met by the http request
- * 
+ *
  * @param {*} mock the mock file config to check
  * @param {object} req Koa's request object
  * @returns {boolean}
@@ -112,7 +112,7 @@ function requestMeetsConditions(req, mock) {
     let [section, ...modifiers] = condition.split('.')
 
     let match = true
-    
+
     // passed in values must match what we expect (no less, no more)
     if (modifiers.includes('equal')) {
       match = isEqual(req[section], criterias)
@@ -134,7 +134,7 @@ function requestMeetsConditions(req, mock) {
 }
 
 /**
- * Delay code exection by <ms> milleseconds 
+ * Delay code exection by <ms> milleseconds
  *
  * @param {*} ms amount of time to delay in milliseconds
  * @retuns {Promise}

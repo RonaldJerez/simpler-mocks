@@ -1,0 +1,4 @@
+- :conditions:
+    body.equal:
+      one: 1
+  :status: 204

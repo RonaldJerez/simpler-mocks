@@ -11,26 +11,22 @@ const cli = new ArgumentParser({
   description: pkg.description
 })
 
-cli.addArgument(['--port', '-p'],
-  {
-    type: 'int',
-    defaultValue: 0,
-    help: 'The port to run the server on. Defaults to a random open port if none is set.'
-  }
-)
+cli.addArgument(['--port', '-p'], {
+  type: 'int',
+  defaultValue: 0,
+  help: 'The port to run the server on. Defaults to a random open port if none is set.'
+})
 
-cli.addArgument(['--silent', '-s'],
-  {
-    action: 'storeTrue',
-    help: 'Hides http access logs from the terminal.'
-  }
-)
+cli.addArgument(['--silent', '-s'], {
+  action: 'storeTrue',
+  help: 'Hides http access logs from the terminal.'
+})
 
-cli.addArgument([ 'directory' ], {
-  nargs:  '?',
+cli.addArgument(['directory'], {
+  nargs: '?',
   defaultValue: './',
-  help:   'The directory where mock api definition files are located. Defaults to the current working directory.'
-});
+  help: 'The directory where mock api definition files are located. Defaults to the current working directory.'
+})
 
 const args = cli.parseArgs()
 

@@ -1,20 +1,40 @@
 {
   "name": "simpler-mocks",
   "version": "0.0.0-development",
+  "description": "Simple Node REST API mock server.  Static file based, with YAML config support for conditional responses.",
+  "keywords": [
+    "api",
+    "cli",
+    "file-based",
+    "json",
+    "mock",
+    "mocks",
+    "node",
+    "node.js",
+    "rest",
+    "server",
+    "yaml",
+    "yml"
+  ],
   "license": "MIT",
   "author": "Ronald Jerez",
   "main": "./src/server.js",
   "bin": {
     "simpler-mocks": "./src/cli.js"
   },
+  "files": [
+    "src/**/*"
+  ],
   "engines": {
-    "node": ">=8"
+    "node": ">=8.0.0"
   },
   "scripts": {
-    "test": "jest",
+    "dev": "nodemon ./src/cli.js ./tests --port 8080",
+    "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
-    "dev": "nodemon ./src/cli.js ./__tests__ --port 8080",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "pretty": "prettier --write \"{src,tests}/**/*.js\"",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "dependencies": {
     "argparse": "^1.0.10",
@@ -28,10 +48,13 @@
     "lodash.ismatchwith": "^4.4.0"
   },
   "devDependencies": {
+    "coveralls": "^3.0.3",
     "cz-conventional-changelog": "2.1.0",
+    "husky": "^1.3.1",
     "jest": "^24.7.1",
     "nodemon": "^1.18.11",
     "prettier": "1.17.0",
+    "pretty-quick": "^1.10.0",
     "semantic-release": "^15.13.3",
     "supertest": "^4.0.2"
   },
@@ -39,9 +62,18 @@
     "type": "git",
     "url": "https://github.com/RonaldJerez/simpler-mocks.git"
   },
+  "bugs": {
+    "url": "https://github.com/RonaldJerez/simpler-mocks/issues"
+  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "post-commit": "git update-index -g",
+      "pre-commit": "pretty-quick --staged"
     }
   }
 }

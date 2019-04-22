@@ -1,6 +1,6 @@
 - # this mock has a matcher
   :conditions:
-    query: 
+    query:
       which: first
 
   :response:
