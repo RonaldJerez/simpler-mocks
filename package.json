@@ -1,7 +1,7 @@
 {
   "name": "simpler-mocks",
   "version": "0.0.0-development",
-  "description": "Simple Node REST API mock server.  Static file based, with YAML config support for conditional responses.",
+  "description": "REST API mock server made simple. Runs on Node with YAML and JSON mock definitions.",
   "keywords": [
     "api",
     "cli",
@@ -29,7 +29,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "dev": "nodemon ./src/cli.js ./tests --port 8080",
+    "dev": "nodemon ./src/cli.js './(tests|samples)' --port 8080",
     "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
     "semantic-release": "semantic-release",
@@ -72,7 +72,6 @@
   },
   "husky": {
     "hooks": {
-      "post-commit": "git update-index -g",
       "pre-commit": "pretty-quick --staged"
     }
   }

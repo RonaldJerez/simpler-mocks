@@ -1,7 +1,10 @@
+# here we are checking that this header key is present
+# but its value is not inspected.
 - :conditions:
     headers.has: x-has-single
   :status: 201
 
+# when the value is a set, we check multiple headers
 - :conditions:
     headers.has:
       - x-has-one

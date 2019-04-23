@@ -1,0 +1,19 @@
+# samples/api/heroes/info.get.yml
+- :conditions:
+    query:
+      name: ironman
+  :status: 200
+  :response:
+    name: Tony Stark
+    team: Avengers
+
+- :conditions:
+    query:
+      name: spiderman
+  :status: 200
+  :response:
+    name: Peter Parker
+    team: Freelancer
+
+- # all others
+  :status: 400

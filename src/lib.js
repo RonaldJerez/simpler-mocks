@@ -114,7 +114,7 @@ function requestMeetsConditions(req, mock) {
     let match = true
 
     // passed in values must match what we expect (no less, no more)
-    if (modifiers.includes('equal')) {
+    if (modifiers.includes('equals')) {
       match = isEqual(req[section], criterias)
       // just check that the keys are part of the request
     } else if (modifiers.includes('has')) {

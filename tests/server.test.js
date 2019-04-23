@@ -82,13 +82,13 @@ describe('Matcher modifiers', () => {
       .set('x-has-two', 'anything')
       .expect(202))
 
-  test('.equal', () =>
+  test('.equals', () =>
     request(server)
       .post('/api/modifier')
       .send({ one: 1 })
       .expect(204))
 
-  test('.equal, extra content', () =>
+  test('.equals, extra content', () =>
     request(server)
       .post('/api/modifier')
       .send({ one: 1, two: 2 })

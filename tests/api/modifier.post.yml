@@ -1,4 +1,6 @@
+# this mock will only respond 200 when body has this
+# exact request, no extra keys allowed.
 - :conditions:
-    body.equal:
+    body.equals:
       one: 1
   :status: 204

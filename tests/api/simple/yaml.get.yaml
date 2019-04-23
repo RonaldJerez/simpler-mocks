@@ -1,3 +1,5 @@
+# this is a plain YAML file, notice non of the schema keys are present
+# the whole document will be converted to JSON and return as the response
 status: active
 person:
   name: john

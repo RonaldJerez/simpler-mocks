@@ -1,3 +1,4 @@
+# delay this response by x milliseconds
 :delay: 200
 :response: |
   delayed response

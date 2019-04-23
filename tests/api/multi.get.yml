@@ -1,4 +1,4 @@
-- # this mock has a matcher
+- # this mock has a condtional matcher, only respond when
   :conditions:
     query:
       which: first
@@ -10,9 +10,10 @@
   :conditions: skip
   :status: 200
 
-- # if nothing matches return this mock
+- # if nothing matches return this response
   :status: 400
   :headers:
     x-custom: custom header value
+
   :response:
     mock: fallback

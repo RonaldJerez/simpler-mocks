@@ -25,7 +25,8 @@ cli.addArgument(['--silent', '-s'], {
 cli.addArgument(['directory'], {
   nargs: '?',
   defaultValue: './',
-  help: 'The directory where mock api definition files are located. Defaults to the current working directory.'
+  help:
+    'The directory where mock api definition files are located. Glob syntax supported. Defaults to the current working directory.'
 })
 
 const args = cli.parseArgs()
