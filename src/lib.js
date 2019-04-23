@@ -78,6 +78,7 @@ function mockHasSchema(mock) {
  *
  * @param {object} ctx Koa context object
  * @param {*} mock the mock file config
+ * @returns
  */
 function respond(ctx, mock) {
   if (!mockHasSchema(mock)) {
@@ -93,8 +94,8 @@ function respond(ctx, mock) {
 /**
  * Checks if a given mock's conditions is met by the http request
  *
- * @param {*} mock the mock file config to check
  * @param {object} req Koa's request object
+ * @param {*} mock the mock file config to check
  * @returns {boolean}
  */
 function requestMeetsConditions(req, mock) {
@@ -107,9 +108,9 @@ function requestMeetsConditions(req, mock) {
   if (conditions === 'skip') return false
 
   // if any fail, its not a match
-  for (condition in conditions) {
+  for (const condition in conditions) {
     const criterias = conditions[condition]
-    let [section, ...modifiers] = condition.split('.')
+    const [section, ...modifiers] = condition.split('.')
 
     let match = true
 
@@ -137,7 +138,7 @@ function requestMeetsConditions(req, mock) {
  * Delay code exection by <ms> milleseconds
  *
  * @param {*} ms amount of time to delay in milliseconds
- * @retuns {Promise}
+ * @returns {Promise}
  */
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
