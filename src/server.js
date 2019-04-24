@@ -1,10 +1,11 @@
+const path = require('path')
 const Koa = require('koa')
 const Router = require('koa-router')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
 const { SCHEMA_KEYS, ...lib } = require('./lib')
 
-const app = new Koa()
+const koa = new Koa()
 const router = new Router()
 
 let mocksDirectory
@@ -42,22 +43,34 @@ router.all('*', async (ctx, next) => {
   await next()
 })
 
-app.use(bodyParser())
-app.use(router.routes())
-app.use(router.allowedMethods())
+koa.use(bodyParser())
+koa.use(router.routes())
+koa.use(router.allowedMethods())
 
 // defaulting the port to 0 allows the OS to select a random free port
 function server(directory = './', port = 0, silent = false) {
-  mocksDirectory = directory
+  const cwd = path.dirname(require.main.filename)
+  mocksDirectory = path.resolve(cwd, directory)
 
   if (!silent) {
-    app.use(logger())
+    koa.use(logger())
   }
 
-  const _server = app.listen(port)
+  const instance = koa.listen(port, function() {
+    console.log(`Simpler-Mocks running at: http://localhost:${this.address().port}`)
+    console.log('Serving files from: ', mocksDirectory)
+  })
 
-  console.log(`Mock server running on:\t http://localhost:${_server.address().port}`)
-  return _server
+  /* istanbul ignore next */
+  instance.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.log(`Port ${error.port} is in use, try a different one.`)
+    } else {
+      throw error
+    }
+  })
+
+  return instance
 }
 
 module.exports = server

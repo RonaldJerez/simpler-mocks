@@ -26,9 +26,8 @@ async function getFileName(mocksDirectory, url, method) {
   // make the path absolute from the value of url
   url = url.substr(1)
 
-  const cwd = path.dirname(require.main.filename)
   const fileName = `${url}.${method.toLowerCase()}.(yaml|yml|json)`
-  const filePath = path.resolve(cwd, mocksDirectory, fileName)
+  const filePath = path.resolve(mocksDirectory, fileName)
 
   const files = await globby(filePath)
 

@@ -1,9 +1,9 @@
 const request = require('supertest')
-const Server = require('../src/server')
+const app = require('../src/server')
 
 let server
 beforeAll(async () => {
-  server = Server('./', 0, true)
+  server = app('./', 0, true)
 })
 
 afterAll(() => {
