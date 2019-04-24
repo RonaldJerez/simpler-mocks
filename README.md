@@ -94,6 +94,7 @@ In order to support sharing of YAML's alias between mock definition Simpler-Mock
   body: {} # body payload
 
 # Delays the response by this many milliseconds
+# it could be a string to specify a range, ie: '800-2000'
 :delay: 1000
 
 # The response status, 200 is default

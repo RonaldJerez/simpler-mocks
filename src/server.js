@@ -12,6 +12,7 @@ let mocksDirectory
 
 // catch all requests
 router.all('*', async (ctx, next) => {
+  const start = Date.now()
   const fileName = await lib.getFileName(mocksDirectory, ctx.path, ctx.method)
 
   if (fileName) {
@@ -33,13 +34,11 @@ router.all('*', async (ctx, next) => {
       return true
     })
 
-    if (delay) {
-      await lib.delay(delay)
-    }
+    await lib.delay(delay, start)
   }
 
-  // no matching mock, return 404
-  await next()
+  // must call to get logger
+  next()
 })
 
 koa.use(bodyParser())

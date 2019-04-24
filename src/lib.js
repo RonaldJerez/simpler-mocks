@@ -134,13 +134,27 @@ function requestMeetsConditions(req, mock) {
 }
 
 /**
- * Delay code exection by <ms> milleseconds
+ * Ensures the response takes atleast <ms> milleseconds
  *
  * @param {*} ms amount of time to delay in milliseconds
+ * @param {*} start the timestamp when the request started
  * @returns {Promise}
  */
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+function delay(ms = 0, start) {
+  if (ms) {
+    // check if its a range ie: x-y
+    range = ms.toString()
+    if (range.indexOf('-') != -1) {
+      let [min, max] = range.split('-')
+      min = parseInt(min)
+      ms = Math.random() * (parseInt(max) - min) + min
+    }
+
+    // remove the amount of time the request has already
+    // take up so we dont over delay for no reason
+    const time = ms - (Date.now() - start)
+    return new Promise((resolve) => setTimeout(resolve, time))
+  }
 }
 
 module.exports = {

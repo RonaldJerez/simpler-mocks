@@ -4,7 +4,7 @@ Fixes
 
 Features
     ☐ Add regexp/function support
-    ☐ Add Delay range
+    ✔ Add Delay range @done(19-04-24 01:36)
     ☐ Add verbose option
     ☐ Add routes index
     ✔ Show which file matched, somehow @done(19-04-24 00:23)

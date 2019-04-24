@@ -42,7 +42,15 @@ describe('General', () => {
     await request(server).get('/api/delay')
     const end = Date.now()
 
-    expect(end - start).toBeGreaterThanOrEqual(200)
+    expect(end - start).toBeGreaterThanOrEqual(150)
+  })
+
+  test('mocks with range delay setting should be delayed', async () => {
+    const start = Date.now()
+    await request(server).get('/api/delay?range')
+    const end = Date.now()
+
+    expect(end - start).toBeGreaterThanOrEqual(250)
   })
 })
 

@@ -1,4 +1,11 @@
-# delay this response by x milliseconds
-:delay: 200
-:response: |
-  delayed response
+- # delay this response by range specified in milliseconds
+  :conditions:
+    query.has: range
+  :delay: '250-500'
+  :response: |
+    range delayed response
+
+- # delay this response by x milliseconds
+  :delay: 150
+  :response: |
+    delayed response
