@@ -1,4 +1,5 @@
 const fs = require('fs')
+const { promisify } = require('util')
 const path = require('path')
 const yaml = require('js-yaml')
 const globby = require('globby')
@@ -13,6 +14,8 @@ const SCHEMA_KEYS = {
   response: ':response'
 }
 
+const readFileAsync = promisify(fs.readFile)
+
 /**
  * Determines if a particular mock exist in our mocks directory, based on the request URL and method
  *
@@ -22,16 +25,15 @@ const SCHEMA_KEYS = {
  * @return {String} the filename that matches this request
  */
 async function getFileName(mocksDirectory, url, method) {
-  // remove the leading '/', otherwise resolve will
+  // remove the leading or trailing '/', otherwise resolve will
   // make the path absolute from the value of url
-  url = url.substr(1)
+  let name = url.replace(/^\/+|\/+$/g, '')
+  name = name ? name : 'index'
+  const ext = `.${method.toLowerCase()}.(yaml|yml|json)`
+  const fileGlob = path.resolve(mocksDirectory, name + ext)
 
-  const fileName = `${url}.${method.toLowerCase()}.(yaml|yml|json)`
-  const filePath = path.resolve(mocksDirectory, fileName)
-
-  const files = await globby(filePath)
-
-  if (files.length) {
+  const files = await globby(fileGlob)
+  if (files.length > 0) {
     return files[0]
   }
 }
@@ -39,27 +41,33 @@ async function getFileName(mocksDirectory, url, method) {
 /**
  * loads the mock config from the specified file
  *
- * @param {*} filename the YAML file with the mock's config
+ * @param {*} fileName the YAML file with the mock's config
  * @returns {Array} an array containing the mock file definition(s)
  */
-function loadMockFile(filename) {
-  let docs = []
-  const file = fs.readFileSync(filename, 'utf8')
+async function loadMockFile(fileName) {
+  let content
 
-  try {
-    docs = yaml.load(file)
-    docs = Array.isArray(docs) ? docs : [docs]
-  } catch (err) {
-    /* istanbul ignore next */
-    console.error(err.message)
+  if (fileName) {
+    const file = await readFileAsync(fileName, 'utf8')
+
+    try {
+      content = yaml.load(file)
+      if (content && !Array.isArray(content)) {
+        content = [content]
+      }
+    } catch (error) {
+      /* istanbul ignore next */
+      console.error(error.message)
+    }
   }
 
-  return docs
+  return content
 }
 
 /**
  * Checks if a given mock has some schema definition
  *
+ * @private
  * @param {*} mock the mock file config
  * @returns {boolean}
  */
@@ -140,7 +148,7 @@ function requestMeetsConditions(req, mock) {
  * @param {*} start the timestamp when the request started
  * @returns {Promise}
  */
-function delay(ms = 0, start) {
+function delay(ms, start) {
   if (ms) {
     // check if its a range ie: x-y
     range = ms.toString()

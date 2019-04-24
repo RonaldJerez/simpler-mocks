@@ -1,12 +1,12 @@
 # Simpler Mocks
 
-> REST API mock server made simple. Runs on Node with YAML and JSON mock definitions.
+> REST API mock server made simple. File based, runs on Node with YAML and JSON mock definitions.
 
 [![Build Status](https://travis-ci.org/RonaldJerez/simpler-mocks.svg?branch=master)](https://travis-ci.org/RonaldJerez/simpler-mocks)
 [![Coverage Status](https://coveralls.io/repos/github/RonaldJerez/simpler-mocks/badge.svg?branch=master)](https://coveralls.io/github/RonaldJerez/simpler-mocks?branch=master)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Simpler-Mocks allows you to setup a mock REST API server fairly quickly by setting a YAML config files per endpoint. Simpler-Mocks can even read JSON files, so if you have some existing static JSON files you can use those to get started quickly and convert them to YAML when you want to make use of some of the more advanced features of Simpler-Mocks. Using [JS-YAML](https://github.com/nodeca/js-yaml) to parse the yaml file.
+Simpler-Mocks allows you to setup a mock REST API server fairly quickly by setting a YAML config file per endpoint. Simpler-Mocks can even read JSON files, so if you have some existing static JSON files you can use those to get started quickly and convert them to YAML when you want to make use of some of the more advanced features of Simpler-Mocks. Using [JS-YAML](https://github.com/nodeca/js-yaml) to parse the yaml file.
 
 ## Example
 
@@ -51,7 +51,7 @@ $ curl http://localhost:8080/api/heroes/info?name=ironman
 
 > Browse the [Samples](samples/) or [Tests](tests/) directory for more.
 
-## Script Usage
+## Node Usage
 
 ```js
 const server = require('simpler-mocks')
@@ -80,7 +80,7 @@ server('./samples', 8080)
 
 In order to support sharing of YAML's alias between mock definition Simpler-Mocks does not support YAML's multi document syntax. Rather we allow multiple definitions via sets.
 
-> Your yaml file can be a single object, or a set of objects matching the below schema. All keys are optional, but you'll need atleast one, otherwise it will result in 404.
+> Your yaml file can be a single object, or a set of objects matching the below schema. All keys are optional.
 
 ```yaml
 # request conditions that must be met in order to consider this mock, each
@@ -106,6 +106,34 @@ In order to support sharing of YAML's alias between mock definition Simpler-Mock
 # The response body
 :response: {}
 ```
+
+## Directory Structure
+
+Simpler-mocks is file based which means that in order for it to respond to requests it must be able to find the corresponding files. The directory structure must match the following pattern.
+
+`{base}/{request.path}.{method}.{ext}`
+
+With the exception of requests to `/`, since there's not request path, that file must be named:
+
+`{base}/index.{method}.{ext}`
+
+The extension can be any of `yaml`, `yml` or `json`
+
+### Examples
+
+Server started with:
+
+```
+simpler-mocks --port 8080 ./mocks
+```
+
+| Request                             | File                          |
+| ----------------------------------- | ----------------------------- |
+| `GET` localhost:8080/               | ./mocks/index.get.yml         |
+| `PUT` localhost:8080/               | ./mocks/index.put.yml         |
+| `POST` localhost:8080/api/user/     | ./mocks/api/user.post.yml     |
+| `GET` localhost:8080/api/user/5/    | ./mocks/api/user/5.get.yml    |
+| `DELETE` localhost:8080/api/user/6/ | ./mocks/api/user/6.delete.yml |
 
 ## Changelog
 

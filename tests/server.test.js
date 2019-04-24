@@ -11,10 +11,20 @@ afterAll(() => {
 })
 
 describe('General', () => {
+  test('empty files', () =>
+    request(server)
+      .get('/api/empty')
+      .expect(404))
+
   test('non existing endpoint', () =>
     request(server)
       .get('/api/non/existant')
       .expect(404))
+
+  test('requests made to /', () =>
+    request(server)
+      .get('/')
+      .expect(200))
 
   test('endpoint with deeper path', () =>
     request(server)

@@ -14,28 +14,25 @@ let mocksDirectory
 router.all('*', async (ctx, next) => {
   const start = Date.now()
   const fileName = await lib.getFileName(mocksDirectory, ctx.path, ctx.method)
+  const mocks = (await lib.loadMockFile(fileName)) || []
 
-  if (fileName) {
-    let delay
-    const mocks = lib.loadMockFile(fileName)
+  let delay = 0
 
-    mocks.some((mock) => {
-      // Array.some short circuits when returning truthy
-      // and continues when returning falsy
-      if (!lib.requestMeetsConditions(ctx.request, mock)) {
-        return false
-      }
+  // Array.some continues when false, breaks when true.
+  mocks.some((mock) => {
+    if (!lib.requestMeetsConditions(ctx.request, mock)) {
+      return false
+    }
 
-      // delay must be done outside the loop otherwise it doesnt work
-      delay = mock[SCHEMA_KEYS.delay] || 0
+    // delay must be done outside the loop otherwise it doesnt work
+    delay = mock[SCHEMA_KEYS.delay]
 
-      ctx.set('x-mock-file', fileName)
-      lib.respond(ctx, mock)
-      return true
-    })
+    ctx.set('x-mock-file', fileName)
+    lib.respond(ctx, mock)
+    return true
+  })
 
-    await lib.delay(delay, start)
-  }
+  await lib.delay(delay, start)
 
   // must call to get logger
   next()
