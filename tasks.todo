@@ -1,15 +1,15 @@
-- Fixes
+Fixes
     ✔ Better error when app.listen() fails @done(19-04-23 23:54)
     ☐ Add support for '/'
 
-- Features
+Features
     ☐ Add regexp/function support
     ☐ Add Delay range
     ☐ Add verbose option
     ☐ Add routes index
-    ☐ Show which file matched, somehow
+    ✔ Show which file matched, somehow @done(19-04-24 00:23)
     
-- Chores
+Chores
     ☐ Add linting
     ☐ Add more samples
 

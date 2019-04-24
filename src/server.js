@@ -28,6 +28,7 @@ router.all('*', async (ctx, next) => {
       // delay must be done outside the loop otherwise it doesnt work
       delay = mock[SCHEMA_KEYS.delay] || 0
 
+      ctx.set('x-mock-file', fileName)
       lib.respond(ctx, mock)
       return true
     })
@@ -35,8 +36,6 @@ router.all('*', async (ctx, next) => {
     if (delay) {
       await lib.delay(delay)
     }
-
-    return
   }
 
   // no matching mock, return 404
