@@ -1,15 +1,21 @@
 Fixes
-    ✔ Better error when app.listen() fails @done(19-04-23 23:54)
-    ✔ Add support for '/' @done(19-04-24 23:49)
+✔ Better error when app.listen() fails @done(19-04-23 23:54)
+✔ Add support for '/' @done(19-04-24 23:49)
+☐ .has should support nested items ie: 'root.sub.another'
+☐ header validation should be case insensitive
 
 Features
-    ☐ Add regexp/function support
-    ✔ Add Delay range @done(19-04-24 01:36)
-    ☐ Add verbose option
-    ☐ Add listing of routes
-    ✔ Show which file matched, somehow @done(19-04-24 00:23)
+✔ Add regexp/function support @done(19-04-25 23:05)
+✔ Add Delay range @done(19-04-24 01:36)
+☐ Add listing of routes
+✔ Show which file matched, somehow @done(19-04-24 00:23)
+☐ Support request such as /ap/users/{match-anything-here}
+☐ Custom types
+☐ Maybe: imports?
+☐ .has.only
     
 Chores
-    ☐ Add linting
-    ☐ Add more samples
+☐ Add verbose option
+☐ Add linting
+☐ Add more samples
 

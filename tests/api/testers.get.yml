@@ -1,0 +1,13 @@
+- :conditions:
+    query:
+      # matches any value in the format: 12-345
+      code: !!js/regexp /\d{2}\-\d{3}/
+  :status: 201
+
+- :conditions:
+    query:
+      # matches any value less than 10
+      code: !!js/function (val) => val < 10
+  :status: 202
+
+- :status: 400

@@ -123,14 +123,14 @@ function requestMeetsConditions(req, mock) {
 
     // passed in values must match what we expect (no less, no more)
     if (modifiers.includes('equals')) {
-      match = isEqual(req[section], criterias)
+      match = isEqual(req[section], criterias, criteriaTester)
       // just check that the keys are part of the request
     } else if (modifiers.includes('has')) {
       const keys = Array.isArray(criterias) ? criterias : [criterias]
       match = keys.every((key) => key in req[section])
       // partially match the request
     } else {
-      match = isMatch(req[section], criterias)
+      match = isMatch(req[section], criterias, criteriaTester)
     }
 
     if (!match) {
@@ -139,6 +139,20 @@ function requestMeetsConditions(req, mock) {
   }
 
   return true
+}
+
+/**
+ * Checks a criteria's value against a particular tester
+ *
+ * @param {*} val the value we got from the request
+ * @param {*} tester the tester (regexp or function)
+ */
+function criteriaTester(val, tester) {
+  if (tester instanceof RegExp) {
+    return tester.test(val)
+  } else if (typeof tester === 'function') {
+    return tester(val)
+  }
 }
 
 /**

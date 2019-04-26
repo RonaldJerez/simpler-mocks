@@ -135,6 +135,43 @@ simpler-mocks --port 8080 ./mocks
 | `GET` localhost:8080/api/user/5/    | ./mocks/api/user/5.get.yml    |
 | `DELETE` localhost:8080/api/user/6/ | ./mocks/api/user/6.delete.yml |
 
+## Condition testers
+
+Aside from static values, the request conditions may also be checked against a function or regular express by ways of YAML tags `!!js/function` and `!!js/regexp`. A boolean response or a successful match respectively, determines if the condition is met.
+
+```yaml
+# api/testers.yml
+- :conditions:
+    query:
+      # matches any value in the format: 12-345
+      code: !!js/regexp /\d{2}\-\d{3}/
+  :status: 200
+
+- :conditions:
+    query:
+      # matches any value less than 10
+      code: !!js/function (val) => val < 10
+  :status: 200
+
+- :status: 400
+```
+
+The following requests will return 200
+
+```
+$ curl http://localhost:8080/api/testers?code=5
+$ curl http://localhost:8080/api/testers?code=8
+$ curl http://localhost:8080/api/testers?code=33-098
+```
+
+While these will return 400
+
+```
+$ curl http://localhost:8080/api/testers?code=15
+$ curl http://localhost:8080/api/testers?code=aa-abc
+$ curl http://localhost:8080/api/testers?code=10
+```
+
 ## Changelog
 
 Please see the [Releases](https://github.com/ronaldjerez/simpler-mocks/releases)

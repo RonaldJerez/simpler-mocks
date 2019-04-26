@@ -132,3 +132,25 @@ describe('Non SCHEMA files', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/))
 })
+
+describe('Testers', () => {
+  test('RegExp Passed', () =>
+    request(server)
+      .get('/api/testers?code=12-345')
+      .expect(201))
+
+  test('RegExp Failed', () =>
+    request(server)
+      .get('/api/testers?code=12345')
+      .expect(400))
+
+  test('Function Passed', () =>
+    request(server)
+      .get('/api/testers?code=5')
+      .expect(202))
+
+  test('Function Failed', () =>
+    request(server)
+      .get('/api/testers?code=20')
+      .expect(400))
+})
