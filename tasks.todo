@@ -2,7 +2,7 @@ Fixes
 ✔ Better error when app.listen() fails @done(19-04-23 23:54)
 ✔ Add support for '/' @done(19-04-24 23:49)
 ☐ .has should support nested items ie: 'root.sub.another'
-☐ header validation should be case insensitive
+✔ header validation should be case insensitive @done(19-04-26 01:43)
 
 Features
 ✔ Add regexp/function support @done(19-04-25 23:05)
@@ -13,9 +13,11 @@ Features
 ☐ Custom types
 ☐ Maybe: imports?
 ☐ .has.only
-    
+
 Chores
 ☐ Add verbose option
 ☐ Add linting
 ☐ Add more samples
+☐ Split tests into seperate test files
+☐ Move documentation from readme into a seperate docs file
 

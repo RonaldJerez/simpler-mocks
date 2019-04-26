@@ -1,0 +1,17 @@
+- :conditions:
+    headers:
+      X-Name: one
+      X-Prop: two
+  :status: 201
+
+- :conditions:
+    headers.has: x-Prop
+  :status: 202
+
+- :condition:
+    headers.has:
+      - X-One
+      - X-Two
+  :status: 203
+
+- :status: 400

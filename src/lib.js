@@ -116,8 +116,19 @@ function requestMeetsConditions(req, mock) {
 
   // if any fail, its not a match
   for (const condition in conditions) {
-    const criterias = conditions[condition]
     const [section, ...modifiers] = condition.split('.')
+    let criterias = conditions[condition]
+
+    // make sure header keys are lower case
+    if (section === 'headers') {
+      if (typeof criterias === 'string') {
+        criterias = criterias.toLowerCase()
+      } else if (Array.isArray(criterias)) {
+        criterias = criterias.map((val) => val.toLowerCase())
+      } else {
+        criterias = keysToLowerCase(criterias)
+      }
+    }
 
     let match = true
 
@@ -142,8 +153,23 @@ function requestMeetsConditions(req, mock) {
 }
 
 /**
+ * Transforms the root keys of an object to lowercase
+ *
+ * @private
+ * @param {object} source the source object
+ * @returns {object} the object with keys in lowercase
+ */
+function keysToLowerCase(source) {
+  return Object.keys(source).reduce((result, key) => {
+    result[key.toLowerCase()] = source[key]
+    return result
+  }, {})
+}
+
+/**
  * Checks a criteria's value against a particular tester
  *
+ * @private
  * @param {*} val the value we got from the request
  * @param {*} tester the tester (regexp or function)
  */

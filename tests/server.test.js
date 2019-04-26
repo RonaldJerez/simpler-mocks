@@ -47,7 +47,7 @@ describe('General', () => {
       .get('/api/multi?which=first')
       .expect({ mock: 'first' }))
 
-  test('mocks with delay setting should be delayed', async () => {
+  test('mocks with delay', async () => {
     const start = Date.now()
     await request(server).get('/api/delay')
     const end = Date.now()
@@ -55,7 +55,7 @@ describe('General', () => {
     expect(end - start).toBeGreaterThanOrEqual(150)
   })
 
-  test('mocks with range delay setting should be delayed', async () => {
+  test('mocks with range delay', async () => {
     const start = Date.now()
     await request(server).get('/api/delay?range')
     const end = Date.now()
@@ -153,4 +153,26 @@ describe('Testers', () => {
     request(server)
       .get('/api/testers?code=20')
       .expect(400))
+})
+
+describe('Case Insenstive Headers', () => {
+  test('With Objects', () =>
+    request(server)
+      .get('/api/headers')
+      .set('x-name', 'one')
+      .set('x-PROP', 'two')
+      .expect(201))
+
+  test('With Strings', () =>
+    request(server)
+      .get('/api/headers')
+      .set('x-PROP', 'anything')
+      .expect(202))
+
+  test('With Sets', () =>
+    request(server)
+      .get('/api/headers')
+      .set('x-ONE', 'anything')
+      .set('x-tWo', 'anything')
+      .expect(203))
 })
