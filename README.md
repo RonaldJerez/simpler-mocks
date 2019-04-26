@@ -84,10 +84,11 @@ In order to support sharing of YAML's alias between mock definition Simpler-Mock
 
 ```yaml
 # request conditions that must be met in order to consider this mock, each
-# subkey may have modifiers (.has, .equals), that affects how its evaluated.
+# subkey may have modifiers (.has, .only), that affects how its evaluated.
 # additonaly, you can set :conditions: to 'skip', to skip this mock all together.
-#   .has  -> checks the presence of keys, but not their values
-#   .equals -> the object must have the exact payload
+#   .has      -> must have these key(s) (string or set)
+#   .only     -> must only contain these values (object)
+#   .only.has -> must have only these key(s) (string or set)
 :conditions:
   query: {} # query params
   headers: {} # request headers

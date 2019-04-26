@@ -12,7 +12,7 @@ Features
 ☐ Support request such as /ap/users/{match-anything-here}
 ☐ Custom types
 ☐ Maybe: imports?
-☐ .has.only
+✔ .has.only @done(19-04-26 02:38)
 
 Chores
 ☐ Add verbose option

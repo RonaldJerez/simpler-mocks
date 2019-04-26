@@ -121,28 +121,10 @@ function requestMeetsConditions(req, mock) {
 
     // make sure header keys are lower case
     if (section === 'headers') {
-      if (typeof criterias === 'string') {
-        criterias = criterias.toLowerCase()
-      } else if (Array.isArray(criterias)) {
-        criterias = criterias.map((val) => val.toLowerCase())
-      } else {
-        criterias = keysToLowerCase(criterias)
-      }
+      criterias = headersCriteriasToLower(criterias)
     }
 
-    let match = true
-
-    // passed in values must match what we expect (no less, no more)
-    if (modifiers.includes('equals')) {
-      match = isEqual(req[section], criterias, criteriaTester)
-      // just check that the keys are part of the request
-    } else if (modifiers.includes('has')) {
-      const keys = Array.isArray(criterias) ? criterias : [criterias]
-      match = keys.every((key) => key in req[section])
-      // partially match the request
-    } else {
-      match = isMatch(req[section], criterias, criteriaTester)
-    }
+    const match = nameMeLater(criterias, modifiers, req[section])
 
     if (!match) {
       return false
@@ -152,6 +134,61 @@ function requestMeetsConditions(req, mock) {
   return true
 }
 
+// TODO: pick a name for this method
+function nameMeLater(criterias, modifiers, request) {
+  let match = true
+
+  if (modifiers.includes('has')) {
+    // just check that the keys are part of the request
+    const keys = Array.isArray(criterias) ? criterias : [criterias]
+    if (modifiers.includes('only')) {
+      match = areEqualSets(keys, object.keys(request))
+    } else {
+      match = keys.every((key) => key in request)
+    }
+  } else if (modifiers.includes('only')) {
+    // request must match our criteria exactly
+    match = isEqual(request, criterias, criteriaTester)
+  } else {
+    // partially match the request
+    match = isMatch(request, criterias, criteriaTester)
+  }
+
+  return match
+}
+
+/**
+ * Transforms the header criterias to lower case
+ *
+ * @param {*} criterias mock's header criterias
+ * @returns {*} transformed criterias
+ */
+function headersCriteriasToLower(criterias) {
+  if (typeof criterias === 'string') {
+    criterias = criterias.toLowerCase()
+  } else if (Array.isArray(criterias)) {
+    criterias = criterias.map((val) => val.toLowerCase())
+  } else {
+    criterias = keysToLower(criterias)
+  }
+  return criterias
+}
+
+/**
+ * Checks that two array contains the same keys
+ *
+ * @param {Array} setOne
+ * @param {Array} setTwo
+ * @returns {boolean}
+ */
+function areEqualSets(setOne, setTwo) {
+  if (setOne.length !== setTwo.length) {
+    return false
+  }
+
+  return !setOne.some((val) => !setTwo.includes(val))
+}
+
 /**
  * Transforms the root keys of an object to lowercase
  *
@@ -159,7 +196,7 @@ function requestMeetsConditions(req, mock) {
  * @param {object} source the source object
  * @returns {object} the object with keys in lowercase
  */
-function keysToLowerCase(source) {
+function keysToLower(source) {
   return Object.keys(source).reduce((result, key) => {
     result[key.toLowerCase()] = source[key]
     return result
