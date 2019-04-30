@@ -1,9 +1,9 @@
 const request = require('supertest')
-const app = require('../src/server')
+const app = require('../src/index')
 
 let server
 beforeAll(async () => {
-  server = app('./', 0, true)
+  server = await app('./', 0, true)
 })
 
 afterAll(() => {
@@ -47,6 +47,18 @@ describe('General', () => {
       .get('/api/multi?which=first')
       .expect({ mock: 'first' }))
 
+  test('wildcard path sections', () => {
+    request(server)
+      .delete('/api/user/1233333/profle')
+      .expect(204)
+  })
+
+  test('wildcard path sections', () => {
+    request(server)
+      .delete('/api/user/555555/profle')
+      .expect(204)
+  })
+
   test('mocks with delay', async () => {
     const start = Date.now()
     await request(server).get('/api/delay')
@@ -80,7 +92,7 @@ describe('Response Content-Type', () => {
       .get('/api/content?type=html')
       .expect('Content-Type', /text\/html/))
 
-  test('text/html', () =>
+  test('text/plain', () =>
     request(server)
       .get('/api/content?type=text')
       .expect('Content-Type', /text\/plain/))
@@ -110,6 +122,16 @@ describe('Matcher modifiers', () => {
     request(server)
       .post('/api/modifier')
       .send({ one: 1, two: 2 })
+      .expect(404))
+
+  test('.only.has', () =>
+    request(server)
+      .get('/api/modifier?item1=true&item2=true')
+      .expect(203))
+
+  test('.only.has, extra content', () =>
+    request(server)
+      .get('/api/modifier?item1=true&item2=true&item3=true')
       .expect(404))
 })
 
@@ -175,4 +197,37 @@ describe('Case Insenstive Headers', () => {
       .set('x-ONE', 'anything')
       .set('x-tWo', 'anything')
       .expect(203))
+})
+
+describe('Custom Tags', () => {
+  test('!request query', () =>
+    request(server)
+      .get('/api/tags?input=hello')
+      .expect(200, { output: 'hello' }))
+
+  test('!request headers', () =>
+    request(server)
+      .get('/api/tags')
+      .set('x-test', 123)
+      .expect(200, { output: '123' }))
+
+  test('!random', () =>
+    request(server)
+      .get('/api/tags?type=random')
+      .expect(200)
+      .expect((res) => {
+        if (!('name' in res.body)) throw new Error('missing name key')
+        if (!('city' in res.body)) throw new Error('missing test key')
+        if (!('number' in res.body || res.body.number == 2)) throw new Error('number missing, or bad data')
+      }))
+
+  test('!include, fixture exists', () =>
+    request(server)
+      .get('/api/tags?type=good-include')
+      .expect(200))
+
+  test('!include, fixture does not exists', () =>
+    request(server)
+      .get('/api/tags?type=bad-include')
+      .expect(404))
 })

@@ -1,38 +1,29 @@
-const path = require('path')
 const Koa = require('koa')
 const Router = require('koa-router')
 const logger = require('koa-logger')
 const bodyParser = require('koa-bodyparser')
+const cache = require('./cache')
 const { SCHEMA_KEYS, ...lib } = require('./lib')
 
 const koa = new Koa()
 const router = new Router()
 
-let mocksDirectory
-
 // catch all requests
 router.all('*', async (ctx, next) => {
   const start = Date.now()
-  const fileName = await lib.getFileName(mocksDirectory, ctx.path, ctx.method)
-  const mocks = (await lib.loadMockFile(fileName)) || []
 
-  let delay = 0
+  // cache the current request before loading the yml file
+  // so we have access to the data in the !request tag
+  cache.request = ctx.request
 
-  // Array.some continues when false, breaks when true.
-  mocks.some((mock) => {
-    if (!lib.requestMeetsConditions(ctx.request, mock)) {
-      return false
-    }
+  const mocks = (await lib.loadMockFile(ctx.method, ctx.path)) || []
+  const mock = mocks.find((mock) => lib.requestMeetsConditions(ctx.request, mock))
 
-    // delay must be done outside the loop otherwise it doesnt work
-    delay = mock[SCHEMA_KEYS.delay]
-
-    ctx.set('x-mock-file', fileName)
+  if (mock) {
+    const delay = mock[SCHEMA_KEYS.delay] || 0
+    await lib.delay(delay, start)
     lib.respond(ctx, mock)
-    return true
-  })
-
-  await lib.delay(delay, start)
+  }
 
   // must call to get logger
   next()
@@ -43,17 +34,14 @@ koa.use(router.routes())
 koa.use(router.allowedMethods())
 
 // defaulting the port to 0 allows the OS to select a random free port
-function server(directory = './', port = 0, silent = false) {
-  const cwd = path.dirname(require.main.filename)
-  mocksDirectory = path.resolve(cwd, directory)
-
+function server(port = 0, silent = false) {
   if (!silent) {
     koa.use(logger())
   }
 
   const instance = koa.listen(port, function() {
     console.log(`Simpler-Mocks running at: http://localhost:${this.address().port}`)
-    console.log('Serving files from: ', mocksDirectory)
+    console.log('Serving files from: ', cache.mocksDirectory)
   })
 
   /* istanbul ignore next */

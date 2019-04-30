@@ -10,3 +10,10 @@
       - x-has-one
       - x-has-two
   :status: 202
+
+# when the value is a set, we check multiple headers
+- :conditions:
+    query.only.has:
+      - item1
+      - item2
+  :status: 203

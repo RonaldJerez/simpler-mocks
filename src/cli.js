@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const path = require('path')
-const server = require('./server')
+const app = require('./index')
 const { ArgumentParser } = require('argparse')
 const pkg = require('../package.json')
 
@@ -32,4 +32,4 @@ cli.addArgument(['directory'], {
 const args = cli.parseArgs()
 
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
-server(mocksDirectory, args.port, args.silent)
+app(mocksDirectory, args.port, args.silent)

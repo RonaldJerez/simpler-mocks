@@ -7,15 +7,16 @@ Fixes
 Features
 ✔ Add regexp/function support @done(19-04-25 23:05)
 ✔ Add Delay range @done(19-04-24 01:36)
-☐ Add listing of routes
+✘ Add listing of routes @cancelled(19-04-26 23:07)
 ✔ Show which file matched, somehow @done(19-04-24 00:23)
-☐ Support request such as /ap/users/{match-anything-here}
-☐ Custom types
-☐ Maybe: imports?
+✔ Support request such as /ap/users/{match-anything-here} @started(19-04-28 20:05) @done(19-04-29 22:45) @lasted(1d2h40m51s)
+✔ Custom types @started(19-04-27 20:05) @done(19-04-29 22:45) @lasted(2d2h40m53s)
+✔ Maybe: imports? @started(19-04-27 20:05) @done(19-04-29 22:45) @lasted(2d2h40m55s)
 ✔ .has.only @done(19-04-26 02:38)
 
 Chores
 ☐ Add verbose option
+☐ Add watch option
 ☐ Add linting
 ☐ Add more samples
 ☐ Split tests into seperate test files

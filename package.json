@@ -29,7 +29,9 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "dev": "nodemon ./src/cli.js './(tests|samples)' --port 8080",
+    "start": "nodemon ./src/cli.js './tests' --port 8080",
+    "samples": "nodemon ./src/cli.js './samples'",
+    "prof": "node --prof ./src/cli.js './tests'",
     "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
     "semantic-release": "semantic-release",
@@ -38,14 +40,17 @@
   },
   "dependencies": {
     "argparse": "^1.0.10",
+    "chance": "^1.0.18",
     "globby": "^9.2.0",
     "js-yaml": "^3.13.1",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-logger": "^3.2.0",
     "koa-router": "^7.4.0",
+    "lodash.get": "^4.4.2",
     "lodash.isequalwith": "^4.4.0",
-    "lodash.ismatchwith": "^4.4.0"
+    "lodash.ismatchwith": "^4.4.0",
+    "minimatch": "^3.0.4"
   },
   "devDependencies": {
     "coveralls": "^3.0.3",

@@ -5,6 +5,9 @@
 [![Build Status](https://travis-ci.org/RonaldJerez/simpler-mocks.svg?branch=master)](https://travis-ci.org/RonaldJerez/simpler-mocks)
 [![Coverage Status](https://coveralls.io/repos/github/RonaldJerez/simpler-mocks/badge.svg?branch=master)](https://coveralls.io/github/RonaldJerez/simpler-mocks?branch=master)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+
+**This project is still a work in progress and is subject to change**
 
 Simpler-Mocks allows you to setup a mock REST API server fairly quickly by setting a YAML config file per endpoint. Simpler-Mocks can even read JSON files, so if you have some existing static JSON files you can use those to get started quickly and convert them to YAML when you want to make use of some of the more advanced features of Simpler-Mocks. Using [JS-YAML](https://github.com/nodeca/js-yaml) to parse the yaml file.
 
@@ -76,7 +79,7 @@ server('./samples', 8080)
     --silent, -s          Hides http access logs from the terminal.
 ```
 
-### YAML Schema
+## YAML Schema
 
 In order to support sharing of YAML's alias between mock definition Simpler-Mocks does not support YAML's multi document syntax. Rather we allow multiple definitions via sets.
 
@@ -172,6 +175,48 @@ $ curl http://localhost:8080/api/testers?code=15
 $ curl http://localhost:8080/api/testers?code=aa-abc
 $ curl http://localhost:8080/api/testers?code=10
 ```
+
+## Response Tags
+
+In the response you are able to use special tags to get some dynamic values.
+
+`!request` allows you to include values from the request object in your model, all [Koa Request](https://koajs.com/#request) values are accessible, (query, headers, body ... )
+
+`!include` allows you to include predefined [#fixtures](fixtures) in your models.
+
+`!random` lets you generate randam data using [Chance](https://chancejs.com/)
+
+### Example
+
+```yaml
+- :conditions:
+    query:
+      id: 25
+  :status: 200
+  :response:
+    userid: !request query.id # returns 25
+    name: !random name middle:true # random name generated with chance
+    address: !include address # imports from __fixtures__/address.yml
+```
+
+<a name="fixtures"></a>
+
+## Fixtures
+
+Fixtures are reusable modals that you wish to include in your mocks using the `!include` tag. In order for Simpler-Mocks to find them, you must create a directory named `__fixtures__` in your mocks base directory. There you can place yaml files in with the name you wish to access them with. For example you can place a yaml file called `address.yml` with the following data into.
+
+```yaml
+id: !random guid
+name: !random name
+line1: 123 Main St
+city: Anytown
+state: NY
+zip: !random zip
+```
+
+> Notice that tags can also be used in your fixtures.
+
+You can then include this fixture in any of your mock responses by setting `!include address` where ever you need it.
 
 ## Changelog
 

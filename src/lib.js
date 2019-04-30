@@ -1,10 +1,11 @@
 const fs = require('fs')
 const { promisify } = require('util')
-const path = require('path')
 const yaml = require('js-yaml')
-const globby = require('globby')
+const minimatch = require('minimatch')
 const isMatch = require('lodash.ismatchwith')
 const isEqual = require('lodash.isequalwith')
+const cache = require('./cache')
+const MOCK_TAGS = require('./simpleMockTags')
 
 const SCHEMA_KEYS = {
   delay: ':delay',
@@ -19,47 +20,46 @@ const readFileAsync = promisify(fs.readFile)
 /**
  * Determines if a particular mock exist in our mocks directory, based on the request URL and method
  *
- * @param {*} mocksDirectory the directory where to mocks are located
- * @param {*} url the request URL
- * @param {*} method the request method used
+ * @param {string} method the request method used
+ * @param {string} url the request URL
  * @return {String} the filename that matches this request
  */
-async function getFileName(mocksDirectory, url, method) {
-  // remove the leading or trailing '/', otherwise resolve will
-  // make the path absolute from the value of url
-  let name = url.replace(/^\/+|\/+$/g, '')
-  name = name ? name : 'index'
-  const ext = `.${method.toLowerCase()}.(yaml|yml|json)`
-  const fileGlob = path.resolve(mocksDirectory, name + ext)
+async function loadMockFile(method, url) {
+  // trim slashs from both ends
+  url = url.replace(/^\/+|\/+$/g, '')
+  method = method.toLowerCase()
 
-  const files = await globby(fileGlob)
-  if (files.length > 0) {
-    return files[0]
+  const name = url ? `${url}.${method}` : `index.${method}`
+  const match = cache.mocks.find((mock) => minimatch(name, mock.pattern))
+  if (match) {
+    console.log('Matched file: ', match.file)
+    return await loadYamlFile(match.file)
   }
 }
 
 /**
  * loads the mock config from the specified file
  *
- * @param {*} fileName the YAML file with the mock's config
+ * @private
+ * @param {string} fileName the YAML file with the mock's config
  * @returns {Array} an array containing the mock file definition(s)
  */
-async function loadMockFile(fileName) {
+async function loadYamlFile(fileName) {
   let content
 
-  if (fileName) {
-    const file = await readFileAsync(fileName, 'utf8')
+  // if (fileName) {
+  const file = await readFileAsync(fileName, 'utf8')
 
-    try {
-      content = yaml.load(file)
-      if (content && !Array.isArray(content)) {
-        content = [content]
-      }
-    } catch (error) {
-      /* istanbul ignore next */
-      console.error(error.message)
+  try {
+    content = yaml.load(file, { schema: MOCK_TAGS })
+    if (content && !Array.isArray(content)) {
+      content = [content]
     }
+  } catch (error) {
+    /* istanbul ignore next */
+    console.error(error.message)
   }
+  // }
 
   return content
 }
@@ -124,7 +124,7 @@ function requestMeetsConditions(req, mock) {
       criterias = headersCriteriasToLower(criterias)
     }
 
-    const match = nameMeLater(criterias, modifiers, req[section])
+    const match = requestMeetsCriterias(req[section], criterias, modifiers)
 
     if (!match) {
       return false
@@ -134,15 +134,24 @@ function requestMeetsConditions(req, mock) {
   return true
 }
 
-// TODO: pick a name for this method
-function nameMeLater(criterias, modifiers, request) {
+/**
+ * Checks if the criterias set in the mock, matches that of the request
+ *
+ * @private
+ * @param {*} criterias
+ * @param {*} modifiers
+ * @param {*} request
+ * @returns {boolean}
+ */
+function requestMeetsCriterias(request, criterias, modifiers) {
   let match = true
 
   if (modifiers.includes('has')) {
     // just check that the keys are part of the request
     const keys = Array.isArray(criterias) ? criterias : [criterias]
     if (modifiers.includes('only')) {
-      match = areEqualSets(keys, object.keys(request))
+      console.log(keys, Object.keys(request))
+      match = areEqualSets(keys, Object.keys(request))
     } else {
       match = keys.every((key) => key in request)
     }
@@ -245,7 +254,6 @@ function delay(ms, start) {
 module.exports = {
   SCHEMA_KEYS,
   delay,
-  getFileName,
   loadMockFile,
   requestMeetsConditions,
   respond
