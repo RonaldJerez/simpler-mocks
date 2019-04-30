@@ -22,6 +22,11 @@ cli.addArgument(['--silent', '-s'], {
   help: 'Hides http access logs from the terminal.'
 })
 
+cli.addArgument(['--verbose', '-vv'], {
+  action: 'storeTrue',
+  help: 'Shows more informational console logs.'
+})
+
 cli.addArgument(['directory'], {
   nargs: '?',
   defaultValue: './',
@@ -32,4 +37,4 @@ cli.addArgument(['directory'], {
 const args = cli.parseArgs()
 
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
-app(mocksDirectory, args.port, args.silent)
+app(mocksDirectory, args.port, args.silent, args.verbose)

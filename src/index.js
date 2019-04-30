@@ -3,9 +3,10 @@ const globby = require('globby')
 const cache = require('./cache')
 const server = require('./server')
 
-async function app(directory = './', port = 0, silent = false) {
+async function app(directory = './', port = 0, silent = false, verbose = false) {
   const cwd = path.dirname(require.main.filename)
   cache.mocksDirectory = path.resolve(cwd, directory)
+  cache.verbose = verbose
 
   await findFixtures()
   await findMockFiles()
@@ -24,7 +25,7 @@ async function findFixtures() {
     const [fileName, key] = file.match(/(\w+)\.ya?ml/i)
 
     if (fileName) {
-      console.log('Found Fixture: ', fileName)
+      cache.verbose && console.log('Found Fixture: ', fileName)
       result[key] = {
         file,
         new: true
@@ -52,7 +53,7 @@ async function findMockFiles() {
       let [file, url] = match
       const pattern = url.replace(/[^\w]_(?=\/|\.)/g, '/*')
 
-      console.log('Found Mock: ', file)
+      cache.verbose && console.log('Found Mock: ', file)
       file = path.resolve(cache.mocksDirectory, mock)
       return { file, pattern }
     }

@@ -15,7 +15,7 @@ Features
 ✔ .has.only @done(19-04-26 02:38)
 
 Chores
-☐ Add verbose option
+✔ Add verbose option @started(19-04-29 22:51) @done(19-04-29 23:02) @lasted(11m2s)
 ☐ Add watch option
 ☐ Add linting
 ☐ Add more samples

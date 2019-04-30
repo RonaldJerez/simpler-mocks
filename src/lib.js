@@ -32,7 +32,7 @@ async function loadMockFile(method, url) {
   const name = url ? `${url}.${method}` : `index.${method}`
   const match = cache.mocks.find((mock) => minimatch(name, mock.pattern))
   if (match) {
-    console.log('Matched file: ', match.file)
+    cache.verbose && console.log('Matched file: ', match.file)
     return await loadYamlFile(match.file)
   }
 }
@@ -150,7 +150,6 @@ function requestMeetsCriterias(request, criterias, modifiers) {
     // just check that the keys are part of the request
     const keys = Array.isArray(criterias) ? criterias : [criterias]
     if (modifiers.includes('only')) {
-      console.log(keys, Object.keys(request))
       match = areEqualSets(keys, Object.keys(request))
     } else {
       match = keys.every((key) => key in request)
