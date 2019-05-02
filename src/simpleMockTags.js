@@ -56,7 +56,7 @@ const RequestType = new yaml.Type('!request', {
     return data !== null
   },
   construct: function(data) {
-    return _get(cache.request, data) || ''
+    return _get(cache.request, data, {})
   }
 })
 
