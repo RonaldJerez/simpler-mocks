@@ -87,6 +87,8 @@ const ChanceType = new yaml.Type('!random', {
         const [key, val] = option.split(':')
         if (key && val) {
           options[key.trim()] = parseValue(val.trim())
+        } else if (key) {
+          options = parseValue(key.trim())
         }
         return options
       }, {})
