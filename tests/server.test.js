@@ -230,4 +230,32 @@ describe('Custom Tags', () => {
     request(server)
       .get('/api/tags?type=bad-include')
       .expect(404))
+
+  test('!any, correct data', () =>
+    request(server)
+      .post('/api/any')
+      .send({
+        address: {
+          name: 123,
+          city: 'anytown',
+          zip: 55555,
+          active: false
+        },
+        opts: [1, 2, 3]
+      })
+      .expect(204))
+
+  test('!any, incorrect data', () =>
+    request(server)
+      .post('/api/any')
+      .send({
+        address: {
+          name: 123,
+          city: 'anytown',
+          zip: '55555',
+          active: 'false'
+        },
+        opts: [1, 2, 3]
+      })
+      .expect(400))
 })

@@ -131,17 +131,23 @@ Server started with:
 simpler-mocks --port 8080 ./mocks
 ```
 
-| Request                             | File                          |
-| ----------------------------------- | ----------------------------- |
-| `GET` localhost:8080/               | ./mocks/index.get.yml         |
-| `PUT` localhost:8080/               | ./mocks/index.put.yml         |
-| `POST` localhost:8080/api/user/     | ./mocks/api/user.post.yml     |
-| `GET` localhost:8080/api/user/5/    | ./mocks/api/user/5.get.yml    |
-| `DELETE` localhost:8080/api/user/6/ | ./mocks/api/user/6.delete.yml |
+| Request                                   | File                             |
+| ----------------------------------------- | -------------------------------- |
+| `GET` localhost:8080/                     | ./mocks/index.get.yml            |
+| `PUT` localhost:8080/                     | ./mocks/index.put.yml            |
+| `POST` localhost:8080/api/user/           | ./mocks/api/user.post.yml        |
+| `GET` localhost:8080/api/user/5/          | ./mocks/api/user/5.get.yml       |
+| `DELETE` localhost:8080/api/user/6/       | ./mocks/api/user/6.delete.yml    |
+| `GET` localhost:8080/api/users/12345/info | ./mocks/api/user/\_/info.get.yml |
+| `GET` localhost:8080/api/address/12345    | ./mocks/api/address/\_.get.yml   |
+
+> If there are parts of the path that can be dynamic, you can use an underscore as part of the filename or directory structure as a placeholder. In the last two examples above, notice that the `12345` is a dynamic ID.
 
 ## Condition testers
 
-Aside from static values, the request conditions may also be checked against a function or regular express by ways of YAML tags `!!js/function` and `!!js/regexp`. A boolean response or a successful match respectively, determines if the condition is met.
+Aside from static values, the request conditions may also be checked against a function or regular express by ways of YAML tags `!!js/function` and `!!js/regexp`. A boolean response or a successful match respectively, determines if the condition is met. Additionally you can also use the custom tag `!any` to check nested object for the existance of a key and not the specific value. The `!any` tag also accepts an optional parameter to check against the value type against.
+
+### Examples
 
 ```yaml
 # api/testers.yml
@@ -156,6 +162,14 @@ Aside from static values, the request conditions may also be checked against a f
       # matches any value less than 10
       code: !!js/function (val) => val < 10
   :status: 200
+
+- :conditions:
+    body:
+      address:
+        name: !any
+        zip: !any number
+        active: !any boolean
+  :status: 201
 
 - :status: 400
 ```
@@ -182,7 +196,7 @@ In the response you are able to use special tags to get some dynamic values.
 
 `!request` allows you to include values from the request object in your model, all [Koa Request](https://koajs.com/#request) values are accessible, (query, headers, body ... )
 
-`!include` allows you to include predefined [#fixtures](fixtures) in your models.
+`!include` allows you to include predefined [fixtures](#fixtures) in your models.
 
 `!random` lets you generate randam data using [Chance](https://chancejs.com/)
 
@@ -203,7 +217,7 @@ In the response you are able to use special tags to get some dynamic values.
 
 ## Fixtures
 
-Fixtures are reusable modals that you wish to include in your mocks using the `!include` tag. In order for Simpler-Mocks to find them, you must create a directory named `__fixtures__` in your mocks base directory. There you can place yaml files in with the name you wish to access them with. For example you can place a yaml file called `address.yml` with the following data into.
+Fixtures are reusable models that you may include in your mocks using the `!include` tag. In order for Simpler-Mocks to find them, you must place them in a directory named `__fixtures__` in your mocks base directory. Place YAML files with the name you wish to access them. For example you can place a YAML file called `address.yml` with the following data into.
 
 ```yaml
 id: !random guid

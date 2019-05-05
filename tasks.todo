@@ -1,7 +1,7 @@
 Fixes
 ✔ Better error when app.listen() fails @done(19-04-23 23:54)
 ✔ Add support for '/' @done(19-04-24 23:49)
-☐ .has should support nested items ie: 'root.sub.another'
+✔ .has should support nested items ie: 'root.sub.another' @done(19-05-05 16:51)
 ✔ header validation should be case insensitive @done(19-04-26 01:43)
 
 Features

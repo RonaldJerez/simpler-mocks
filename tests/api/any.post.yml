@@ -1,0 +1,11 @@
+- :conditions:
+    body:
+      address:
+        name: !any
+        city: !any string
+        zip: !any number
+        active: !any boolean
+      opts: !any array
+  :status: 204
+
+- :status: 400

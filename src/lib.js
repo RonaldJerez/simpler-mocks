@@ -5,6 +5,7 @@ const minimatch = require('minimatch')
 const isMatch = require('lodash.ismatchwith')
 const isEqual = require('lodash.isequalwith')
 const cache = require('./cache')
+const util = require('./util')
 const MOCK_TAGS = require('./simpleMockTags')
 
 const SCHEMA_KEYS = {
@@ -46,8 +47,6 @@ async function loadMockFile(method, url) {
  */
 async function loadYamlFile(fileName) {
   let content
-
-  // if (fileName) {
   const file = await readFileAsync(fileName, 'utf8')
 
   try {
@@ -59,7 +58,6 @@ async function loadYamlFile(fileName) {
     /* istanbul ignore next */
     console.error(error.message)
   }
-  // }
 
   return content
 }
@@ -150,16 +148,16 @@ function requestMeetsCriterias(request, criterias, modifiers) {
     // just check that the keys are part of the request
     const keys = Array.isArray(criterias) ? criterias : [criterias]
     if (modifiers.includes('only')) {
-      match = areEqualSets(keys, Object.keys(request))
+      match = util.areEqualSets(keys, Object.keys(request))
     } else {
       match = keys.every((key) => key in request)
     }
   } else if (modifiers.includes('only')) {
     // request must match our criteria exactly
-    match = isEqual(request, criterias, criteriaTester)
+    match = isEqual(request, criterias, util.criteriaTester)
   } else {
     // partially match the request
-    match = isMatch(request, criterias, criteriaTester)
+    match = isMatch(request, criterias, util.criteriaTester)
   }
 
   return match
@@ -177,53 +175,9 @@ function headersCriteriasToLower(criterias) {
   } else if (Array.isArray(criterias)) {
     criterias = criterias.map((val) => val.toLowerCase())
   } else {
-    criterias = keysToLower(criterias)
+    criterias = util.keysToLower(criterias)
   }
   return criterias
-}
-
-/**
- * Checks that two array contains the same keys
- *
- * @param {Array} setOne
- * @param {Array} setTwo
- * @returns {boolean}
- */
-function areEqualSets(setOne, setTwo) {
-  if (setOne.length !== setTwo.length) {
-    return false
-  }
-
-  return !setOne.some((val) => !setTwo.includes(val))
-}
-
-/**
- * Transforms the root keys of an object to lowercase
- *
- * @private
- * @param {object} source the source object
- * @returns {object} the object with keys in lowercase
- */
-function keysToLower(source) {
-  return Object.keys(source).reduce((result, key) => {
-    result[key.toLowerCase()] = source[key]
-    return result
-  }, {})
-}
-
-/**
- * Checks a criteria's value against a particular tester
- *
- * @private
- * @param {*} val the value we got from the request
- * @param {*} tester the tester (regexp or function)
- */
-function criteriaTester(val, tester) {
-  if (tester instanceof RegExp) {
-    return tester.test(val)
-  } else if (typeof tester === 'function') {
-    return tester(val)
-  }
 }
 
 /**

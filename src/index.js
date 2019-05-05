@@ -24,12 +24,10 @@ async function findFixtures() {
   const fixtures = files.reduce((result, file) => {
     const [fileName, key] = file.match(/(\w+)\.ya?ml/i)
 
-    if (fileName) {
-      cache.verbose && console.log('Found Fixture: ', fileName)
-      result[key] = {
-        file,
-        new: true
-      }
+    cache.verbose && console.log('Found Fixture: ', fileName)
+    result[key] = {
+      file,
+      new: true
     }
 
     return result
@@ -49,14 +47,12 @@ async function findMockFiles() {
   const config = mocks.map((mock) => {
     const match = mock.match(/(.*)\.(ya?ml|json)/i)
 
-    if (match) {
-      let [file, url] = match
-      const pattern = url.replace(/[^\w]_(?=\/|\.)/g, '/*')
+    let [file, url] = match
+    const pattern = url.replace(/[^\w]_(?=\/|\.)/g, '/*')
 
-      cache.verbose && console.log('Found Mock: ', file)
-      file = path.resolve(cache.mocksDirectory, mock)
-      return { file, pattern }
-    }
+    cache.verbose && console.log('Found Mock: ', file)
+    file = path.resolve(cache.mocksDirectory, mock)
+    return { file, pattern }
   })
 
   // TODO: watch the mocks directory for changes

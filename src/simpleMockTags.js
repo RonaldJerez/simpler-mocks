@@ -3,6 +3,7 @@ const yaml = require('js-yaml')
 const _get = require('lodash.get')
 const Chance = require('chance')
 const cache = require('./cache')
+const util = require('./util')
 
 let MOCK_TAGS
 const chance = new Chance()
@@ -60,7 +61,7 @@ const RequestType = new yaml.Type('!request', {
   }
 })
 
-// gets data from the request object
+// generates random data using chance js
 const ChanceType = new yaml.Type('!random', {
   kind: 'scalar',
   resolve: function(data) {
@@ -74,37 +75,20 @@ const ChanceType = new yaml.Type('!random', {
       type = data
     } else {
       type = data.substring(0, indexOfSpace)
-      options = parseOptions(data.substring(indexOfSpace))
-    }
-
-    // -----
-
-    // parses a string of options, returns object
-    function parseOptions(str) {
-      const arr = str.split(',')
-
-      return arr.reduce((options, option) => {
-        const [key, val] = option.split(':')
-        if (key && val) {
-          options[key.trim()] = parseValue(val.trim())
-        } else if (key) {
-          options = parseValue(key.trim())
-        }
-        return options
-      }, {})
-    }
-
-    // parses the value from string to real type (boolean or array)
-    function parseValue(str) {
-      if (str === 'true') return true
-      else if (str === 'false') return false
-      else if (str.indexOf('|') > 0) return str.split('|')
-      else return str
+      options = util.parseOptions(data.substring(indexOfSpace))
     }
 
     return chance[type] ? chance[type](options) : undefined
   }
 })
 
-MOCK_TAGS = yaml.Schema.create([IncludeType, RequestType, ChanceType])
+const AnyType = new yaml.Type('!any', {
+  kind: 'scalar',
+  construct: function(data) {
+    return new util.Any(data)
+  },
+  instanceOf: util.Any
+})
+
+MOCK_TAGS = yaml.Schema.create([AnyType, ChanceType, IncludeType, RequestType])
 module.exports = MOCK_TAGS
