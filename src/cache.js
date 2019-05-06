@@ -3,7 +3,7 @@
 //   verbose: false
 //   mocksDirectory: '',
 //   request: koa.request,
-//   fixtures: {
+//   : {
 //     file: '/path/to/file',
 //     new: true,
 //     content: ''
@@ -16,4 +16,7 @@
 //   ]
 // }
 
-module.exports = {}
+module.exports = {
+  fixtures: {},
+  mocks: []
+}

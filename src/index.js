@@ -1,9 +1,11 @@
 const path = require('path')
 const globby = require('globby')
+const chokidar = require('chokidar')
 const cache = require('./cache')
 const server = require('./server')
+const util = require('./util')
 
-async function app(directory = './', port = 0, silent = false, verbose = false) {
+async function app(directory = './', { port, silent, verbose, watch }) {
   const cwd = path.dirname(require.main.filename)
   cache.mocksDirectory = path.resolve(cwd, directory)
   cache.verbose = verbose
@@ -11,30 +13,109 @@ async function app(directory = './', port = 0, silent = false, verbose = false) 
   await findFixtures()
   await findMockFiles()
 
+  if (watch) {
+    chokidar
+      .watch('**/*.(yml|yaml|json)', { cwd: cache.mocksDirectory, ignoreInitial: true })
+      .on('add', onAdd)
+      .on('change', addFixture)
+      .on('unlink', onRemove)
+  }
+
   return server(port, silent)
+}
+
+/**
+ * Chokidar add event handler
+ * @param {string} file
+ */
+function onAdd(file) {
+  if (file.startsWith('__fixtures__')) {
+    addFixture(file)
+  } else {
+    addMock(file)
+  }
+}
+
+/**
+ * Chokidar unlink event handler
+ * @param {string} file
+ */
+function onRemove(file) {
+  if (file.startsWith('__fixtures__')) {
+    removeFixture(file)
+  } else {
+    removeMock(file)
+  }
+}
+
+/**
+ * Adds fixtures to the cache, or marks an existing fixture as new so it can be reloaded
+ * @param {string} file
+ */
+function addFixture(file) {
+  if (!file.startsWith('__fixtures__')) return
+
+  util.log('Added Fixture: ', file)
+
+  const match = file.match(/(\w+)\.ya?ml/i)
+  const key = match[1]
+
+  const filePath = path.resolve(cache.mocksDirectory, file)
+  cache.fixtures[key] = {
+    file: filePath,
+    new: true
+  }
+}
+
+/**
+ * Removes a fixture from the cache
+ * @param {string} file
+ */
+function removeFixture(file) {
+  util.log('Removed Fixture: ', file)
+
+  const match = file.match(/(\w+)\.ya?ml/i)
+  const key = match[1]
+  delete cache.fixtures[key]
+}
+
+/**
+ * Adds a mock to the cache
+ * @param {string} file
+ */
+function addMock(file) {
+  util.log('Added Mock: ', file)
+
+  const match = file.match(/(.*)\.(ya?ml|json)/i)
+  const pattern = match[1].replace(/[^\w]_(?=\/|\.)/g, '/*')
+
+  const filePath = path.resolve(cache.mocksDirectory, file)
+
+  cache.mocks.push({ file: filePath, pattern })
+}
+
+/**
+ * Removes a mock from cache
+ * @param {string} file
+ */
+function removeMock(file) {
+  util.log('Removed Mock: ', file)
+
+  const index = cache.mocks.find((mock) => mock.file === file)
+
+  if (index > -1) {
+    cache.mocks.splice(index, 1)
+  }
 }
 
 /**
  * Get a list of all the fixtures and saves it to the cache
  */
 async function findFixtures() {
-  const glob = path.resolve(cache.mocksDirectory, '__fixtures__', '*.(yml|yaml)')
-  const files = await globby(glob)
+  const glob = '__fixtures__/*.(yml|yaml)'
+  const files = await globby(glob, { cwd: cache.mocksDirectory })
 
-  const fixtures = files.reduce((result, file) => {
-    const [fileName, key] = file.match(/(\w+)\.ya?ml/i)
-
-    cache.verbose && console.log('Found Fixture: ', fileName)
-    result[key] = {
-      file,
-      new: true
-    }
-
-    return result
-  }, {})
-
-  // TODO: watch the fixture directory for changes
-  cache.fixtures = fixtures
+  files.forEach(addFixture)
 }
 
 /**
@@ -44,19 +125,7 @@ async function findMockFiles() {
   const mocksGlob = ['**/*.(yml|yaml|json)', '!__fixtures__']
   const mocks = await globby(mocksGlob, { cwd: cache.mocksDirectory })
 
-  const config = mocks.map((mock) => {
-    const match = mock.match(/(.*)\.(ya?ml|json)/i)
-
-    let [file, url] = match
-    const pattern = url.replace(/[^\w]_(?=\/|\.)/g, '/*')
-
-    cache.verbose && console.log('Found Mock: ', file)
-    file = path.resolve(cache.mocksDirectory, mock)
-    return { file, pattern }
-  })
-
-  // TODO: watch the mocks directory for changes
-  cache.mocks = config
+  mocks.forEach(addMock)
 }
 
 module.exports = app

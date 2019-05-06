@@ -33,7 +33,7 @@ async function loadMockFile(method, url) {
   const name = url ? `${url}.${method}` : `index.${method}`
   const match = cache.mocks.find((mock) => minimatch(name, mock.pattern))
   if (match) {
-    cache.verbose && console.log('Matched file: ', match.file)
+    util.log('Matched file: ', match.file)
     return await loadYamlFile(match.file)
   }
 }

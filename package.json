@@ -41,6 +41,7 @@
   "dependencies": {
     "argparse": "^1.0.10",
     "chance": "^1.0.18",
+    "chokidar": "^3.0.0",
     "globby": "^9.2.0",
     "js-yaml": "^3.13.1",
     "koa": "^2.7.0",

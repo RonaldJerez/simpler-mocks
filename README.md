@@ -58,7 +58,7 @@ $ curl http://localhost:8080/api/heroes/info?name=ironman
 
 ```js
 const server = require('simpler-mocks')
-server('./samples', 8080)
+server('./samples', { port: 8080, watch: true })
 ```
 
 ## CLI Usage
@@ -68,15 +68,16 @@ server('./samples', 8080)
 
     Positional arguments:
     directory             The directory where mock api definition files are
-                            located. Glob syntax supported. Defaults to the
-                            current working directory.
+                          located. Glob syntax supported. Defaults to the
+                          current working directory.
 
     Optional arguments:
     -h, --help            Show this help message and exit.
     -v, --version         Show program's version number and exit.
     --port PORT, -p PORT  The port to run the server on. Defaults to a random
-                            open port if none is set.
+                          open port if none is set.
     --silent, -s          Hides http access logs from the terminal.
+    --watch, -w           Watch the base directory for changes
 ```
 
 ## YAML Schema

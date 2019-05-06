@@ -1,3 +1,5 @@
+const cache = require('./cache')
+
 /**
  * Parses a string of options into an object or its true type
  *
@@ -85,11 +87,20 @@ function criteriaTester(val, tester) {
   }
 }
 
-// the Any class
+// the Any class to be used for the custom !any tag
 // type = boolean|string|number|array
 function Any(type) {
   if (type) {
     this.type = type.toLowerCase()
+  }
+}
+
+/**
+ * Verbose logging utility function
+ */
+function log() {
+  if (cache.verbose) {
+    console.log.apply(console, arguments)
   }
 }
 
@@ -98,5 +109,6 @@ module.exports = {
   areEqualSets,
   criteriaTester,
   keysToLower,
+  log,
   parseOptions
 }

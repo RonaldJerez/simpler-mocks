@@ -27,6 +27,11 @@ cli.addArgument(['--verbose', '-vv'], {
   help: 'Shows more informational console logs.'
 })
 
+cli.addArgument(['--watch', '-w'], {
+  action: 'storeTrue',
+  help: 'Watch the base directory for changes'
+})
+
 cli.addArgument(['directory'], {
   nargs: '?',
   defaultValue: './',
@@ -37,4 +42,4 @@ cli.addArgument(['directory'], {
 const args = cli.parseArgs()
 
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
-app(mocksDirectory, args.port, args.silent, args.verbose)
+app(mocksDirectory, args)

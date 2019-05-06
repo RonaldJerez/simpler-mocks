@@ -3,7 +3,7 @@ const app = require('../src/index')
 
 let server
 beforeAll(async () => {
-  server = await app('./', 0, true)
+  server = await app('./', { silent: true })
 })
 
 afterAll(() => {
@@ -218,7 +218,8 @@ describe('Custom Tags', () => {
       .expect((res) => {
         if (!('name' in res.body)) throw new Error('missing name key')
         if (!('city' in res.body)) throw new Error('missing test key')
-        if (!('number' in res.body || res.body.number == 2)) throw new Error('number missing, or bad data')
+        if (!('number' in res.body || res.body.number == 2))
+          throw new Error('number missing, or bad data')
       }))
 
   test('!include, fixture exists', () =>
