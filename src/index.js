@@ -33,6 +33,7 @@ function onAdd(file) {
     addFixture(file)
   } else {
     addMock(file)
+    cache.mocks.sort(mocksSorter)
   }
 }
 
@@ -125,6 +126,20 @@ async function findMockFiles() {
   const mocks = await globby(mocksGlob, { cwd: cache.mocksDirectory })
 
   mocks.forEach(addMock)
+  cache.mocks.sort(mocksSorter)
+}
+
+/**
+ * Sorts the mocks, putting any with a wildcard towards the bottom
+ * @param {*} a
+ * @param {*} b
+ */
+function mocksSorter(a, b) {
+  if (a.pattern.indexOf('*') > -1) {
+    return 1
+  } else {
+    return 0
+  }
 }
 
 module.exports = app
