@@ -99,11 +99,10 @@ function addMock(file) {
  * @param {string} file
  */
 function removeMock(file) {
-  util.log('Removed Mock: ', file)
-
-  const index = cache.mocks.find((mock) => mock.file === file)
+  const index = cache.mocks.findIndex((mock) => mock.file.endsWith(file))
 
   if (index > -1) {
+    util.log('Removed Mock: ', file)
     cache.mocks.splice(index, 1)
   }
 }

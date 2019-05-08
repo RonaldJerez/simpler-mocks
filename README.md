@@ -146,7 +146,7 @@ simpler-mocks --port 8080 ./mocks
 
 ## Condition testers
 
-Aside from static values, the request conditions may also be checked against a function or regular express by ways of YAML tags `!!js/function` and `!!js/regexp`. A boolean response or a successful match respectively, determines if the condition is met. Additionally you can also use the custom tag `!any` to check nested object for the existance of a key and not the specific value. The `!any` tag also accepts an optional parameter to check against the value type against.
+Aside from static values, the request conditions may also be checked against a function or regular express by ways of YAML tags `!!js/function` and `!!js/regexp`. A boolean response or a successful match respectively, determines if the condition is met. Additionally you can also use the custom tag `!any` to check nested object for the existance of a key and not the specific value. The `!any` tag also accepts an optional parameter to check against the value.
 
 ### Examples
 

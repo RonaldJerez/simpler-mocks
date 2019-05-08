@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "nodemon ./src/cli.js  -- -p 8080 './tests'",
-    "samples": "nodemon ./src/cli.js -- './samples'",
+    "samples": "node ./src/cli.js './samples'",
     "prof": "node --prof ./src/cli.js -p 8080 './tests'",
     "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
