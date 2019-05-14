@@ -82,16 +82,56 @@ function criteriaTester(val, tester) {
     }
   } else if (tester instanceof RegExp) {
     return tester.test(val)
+  } else if (tester instanceof MockRegExp) {
+    const matches = tester.pattern.exec(val)
+
+    if (matches && matches.length > 1) {
+      tester.data = matches.length === 2 ? matches[1] : matches.slice(1)
+    }
+
+    return !!matches
   } else if (typeof tester === 'function') {
     return tester(val)
   }
 }
 
-// the Any class to be used for the custom !any tag
-// type = boolean|string|number|array
-function Any(type) {
-  if (type) {
-    this.type = type.toLowerCase()
+/**
+ * @class
+ * the Any class to be used to identify the custom !any tag
+ *
+ * @property {string} type
+ */
+class Any {
+  /**
+   * constructors new Any
+   * @param {string} type the type of data this tag will match, could be boolean|string|number|array
+   */
+  constructor(type) {
+    if (type) {
+      this.type = type.toLowerCase()
+    }
+  }
+}
+
+/**
+ * @class
+ * Custom regexp Class that outputs the content of data to when dumping JSON
+ *
+ * @property {RegExp} pattern
+ * @property {*} data the value of this object to be outputed using toJSON
+ */
+class MockRegExp {
+  /**
+   * constructs new MockRegExp
+   * @param {*} pattern the regexp pattern for this object
+   */
+  constructor(pattern) {
+    this.pattern = pattern
+    this.data = pattern
+  }
+
+  toJSON() {
+    return this.data
   }
 }
 
@@ -110,5 +150,6 @@ module.exports = {
   criteriaTester,
   keysToLower,
   log,
-  parseOptions
+  parseOptions,
+  MockRegExp
 }

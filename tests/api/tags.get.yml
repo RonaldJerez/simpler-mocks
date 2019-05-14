@@ -33,3 +33,23 @@
   :response:
     address: !include address
     empty: !include not-exist
+
+- :conditions:
+    query:
+      type: regexp
+      email: !regexp &nickname /(.*)@.*\.com/
+  :response:
+    nickname: *nickname
+
+- :conditions:
+    query:
+      type: regexp2
+      pin: !regexp &status /000(\d{3})/
+  :status: *status
+
+- :conditions:
+    query:
+      type: regexp3
+      email: !regexp &data /(.*)@(.*)\.com/
+  :response:
+    data: *data

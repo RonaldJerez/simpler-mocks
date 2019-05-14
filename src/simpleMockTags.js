@@ -15,10 +15,8 @@ const chance = new Chance()
 // includes a fixture
 const IncludeType = new yaml.Type('!include', {
   kind: 'scalar',
-  resolve: function(data) {
-    return data !== null
-  },
-  construct: function(name) {
+  resolve: (data) => data !== null,
+  construct: (name) => {
     let fileContent, output
     const fixture = cache.fixtures[name]
 
@@ -53,21 +51,15 @@ const IncludeType = new yaml.Type('!include', {
 // gets data from the request object
 const RequestType = new yaml.Type('!request', {
   kind: 'scalar',
-  resolve: function(data) {
-    return data !== null
-  },
-  construct: function(data) {
-    return _get(cache.request, data, {})
-  }
+  resolve: (data) => data !== null,
+  construct: (data) => _get(cache.request, data, {})
 })
 
 // generates random data using chance js
 const ChanceType = new yaml.Type('!random', {
   kind: 'scalar',
-  resolve: function(data) {
-    return data !== null
-  },
-  construct: function(data) {
+  resolve: (data) => data !== null,
+  construct: (data) => {
     let type, options
     const indexOfSpace = data.indexOf(' ')
 
@@ -82,13 +74,27 @@ const ChanceType = new yaml.Type('!random', {
   }
 })
 
+// match any type of data
 const AnyType = new yaml.Type('!any', {
   kind: 'scalar',
-  construct: function(data) {
-    return new util.Any(data)
-  },
+  construct: (data) => new util.Any(data),
   instanceOf: util.Any
 })
 
-MOCK_TAGS = yaml.Schema.create([AnyType, ChanceType, IncludeType, RequestType])
+// custom !regexp tag, based on the original !!js/regexp tag definition
+const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2002:js/regexp']
+
+const mockRegExpOptions = {
+  ...jsRegExp,
+  instanceOf: util.MockRegExp,
+  construct: (data) => {
+    const regexp = jsRegExp.construct(data)
+    return new util.MockRegExp(regexp)
+  }
+}
+delete mockRegExpOptions.tag
+delete mockRegExpOptions.predicate
+const MockRegExpType = new yaml.Type('!regexp', mockRegExpOptions)
+
+MOCK_TAGS = yaml.Schema.create([AnyType, ChanceType, IncludeType, RequestType, MockRegExpType])
 module.exports = MOCK_TAGS

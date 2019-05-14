@@ -91,7 +91,11 @@ function respond(ctx, mock) {
     return
   }
 
-  if (mock[SCHEMA_KEYS.status]) ctx.status = mock[SCHEMA_KEYS.status]
+  if (mock[SCHEMA_KEYS.status]) {
+    const mockStatus = mock[SCHEMA_KEYS.status]
+    ctx.status = mockStatus instanceof util.MockRegExp ? Number(mockStatus.data) : mockStatus
+  }
+
   if (mock[SCHEMA_KEYS.headers]) ctx.set(mock[SCHEMA_KEYS.headers])
   if (mock[SCHEMA_KEYS.response]) ctx.body = mock[SCHEMA_KEYS.response]
 }

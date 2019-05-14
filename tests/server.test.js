@@ -259,4 +259,19 @@ describe('Custom Tags', () => {
         opts: [1, 2, 3]
       })
       .expect(400))
+
+  test('!regexp, single group', () =>
+    request(server)
+      .get('/api/tags?type=regexp&email=rocket@guardians.com')
+      .expect(200, { nickname: 'rocket' }))
+
+  test('!regexp, multi group', () =>
+    request(server)
+      .get('/api/tags?type=regexp3&email=rocket@guardians.com')
+      .expect(200, { data: ['rocket', 'guardians'] }))
+
+  test('!regexp, status', () =>
+    request(server)
+      .get('/api/tags?type=regexp2&pin=000202')
+      .expect(202))
 })
