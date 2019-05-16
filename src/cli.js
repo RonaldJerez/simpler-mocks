@@ -13,7 +13,7 @@ const cli = new ArgumentParser({
 
 cli.addArgument(['--port', '-p'], {
   type: 'int',
-  defaultValue: 0,
+  defaultValue: process.env.MOCKS_PORT || 0,
   help: 'The port to run the server on. Defaults to a random open port if none is set.'
 })
 
