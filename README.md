@@ -90,9 +90,12 @@ In order to support sharing of YAML's alias between mock definition Simpler-Mock
 # request conditions that must be met in order to consider this mock, each
 # subkey may have modifiers (.has, .only), that affects how its evaluated.
 # additonaly, you can set :conditions: to 'skip', to skip this mock all together.
+# the modifiers may also be negated by adding a .not modifier to the mix.
+
 #   .has      -> must have these key(s) (string or set)
 #   .only     -> must only contain these values (object)
 #   .only.has -> must have only these key(s) (string or set)
+#   .not.has  -> does not have certain keys
 :conditions:
   query: {} # query params
   headers: {} # request headers

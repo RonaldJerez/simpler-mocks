@@ -164,7 +164,7 @@ function requestMeetsCriterias(request, criterias, modifiers) {
     match = isMatch(request, criterias, util.criteriaTester)
   }
 
-  return match
+  return modifiers.includes('not') ? !match : match
 }
 
 /**

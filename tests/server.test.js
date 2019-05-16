@@ -124,6 +124,12 @@ describe('Matcher modifiers', () => {
       .send({ one: 1, two: 2 })
       .expect(404))
 
+  test('.not', () =>
+    request(server)
+      .post('/api/modifier')
+      .send({ one: 1, three: 3 })
+      .expect(203))
+
   test('.only.has', () =>
     request(server)
       .get('/api/modifier?item1=true&item2=true')

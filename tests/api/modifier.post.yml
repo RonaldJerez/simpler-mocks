@@ -4,3 +4,9 @@
     body.only:
       one: 1
   :status: 204
+
+- :conditions:
+    body:
+      one: 1
+    body.not.has: 'two'
+  :status: 203
