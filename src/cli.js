@@ -43,3 +43,7 @@ const args = cli.parseArgs()
 
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
 app(mocksDirectory, args)
+
+// exit gracefully
+process.on('SIGINT', process.exit)
+process.on('SIGTERM', process.exit)
