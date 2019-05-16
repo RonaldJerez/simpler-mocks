@@ -48,6 +48,7 @@ function server(port = 0, silent = false) {
   instance.on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
       console.log(`Port ${error.port} is in use, try a different one.`)
+      process.exit(1)
     } else {
       throw error
     }
