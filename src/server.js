@@ -40,8 +40,8 @@ function server(port = 0, silent = false) {
   }
 
   const instance = koa.listen(port, function() {
-    console.log(`Simpler-Mocks running at: http://localhost:${this.address().port}`)
-    console.log('Serving files from: ', cache.mocksDirectory)
+    console.log(`\nSimpler-Mocks running at: http://localhost:${this.address().port}`)
+    console.log(`Serving files from: ${cache.mocksDirectory}\n`)
   })
 
   /* istanbul ignore next */

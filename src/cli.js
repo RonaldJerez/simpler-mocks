@@ -45,5 +45,10 @@ const mocksDirectory = path.resolve(process.cwd(), args.directory)
 app(mocksDirectory, args)
 
 // exit gracefully
-process.on('SIGINT', process.exit)
-process.on('SIGTERM', process.exit)
+function exit(signal) {
+  console.log(`Received signal: ${signal}, exiting`)
+  process.exit(0)
+}
+
+process.on('SIGINT', exit)
+process.on('SIGTERM', exit)
