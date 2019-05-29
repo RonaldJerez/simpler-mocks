@@ -7,6 +7,7 @@ const { SCHEMA_KEYS, ...lib } = require('./lib')
 
 const koa = new Koa()
 const router = new Router()
+let skipDelays = false
 
 // catch all requests
 router.all('*', async (ctx, next) => {
@@ -20,8 +21,9 @@ router.all('*', async (ctx, next) => {
   const mock = mocks.find((mock) => lib.requestMeetsConditions(ctx.request, mock))
 
   if (mock) {
-    const delay = mock[SCHEMA_KEYS.delay] || 0
-    await lib.delay(delay, start)
+    if (mock[SCHEMA_KEYS.delay] && !skipDelays) {
+      await lib.delay(mock[SCHEMA_KEYS.delay], start)
+    }
     lib.respond(ctx, mock)
   }
 
@@ -34,7 +36,9 @@ koa.use(router.routes())
 koa.use(router.allowedMethods())
 
 // defaulting the port to 0 allows the OS to select a random free port
-function server(port = 0, silent = false) {
+function server({ port = 0, silent = false, nodelays = false }) {
+  skipDelays = nodelays
+
   if (!silent) {
     koa.use(logger())
   }

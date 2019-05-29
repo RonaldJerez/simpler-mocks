@@ -5,7 +5,8 @@ const cache = require('./cache')
 const server = require('./server')
 const util = require('./util')
 
-async function app(directory = './', { port, silent, verbose, watch }) {
+async function app(directory = './', options) {
+  const { verbose, watch } = options
   const cwd = path.dirname(require.main.filename)
   cache.mocksDirectory = path.resolve(cwd, directory)
   cache.verbose = verbose
@@ -21,7 +22,7 @@ async function app(directory = './', { port, silent, verbose, watch }) {
       .on('unlink', onRemove)
   }
 
-  return server(port, silent)
+  return server(options)
 }
 
 /**

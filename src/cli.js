@@ -32,6 +32,11 @@ cli.addArgument(['--watch', '-w'], {
   help: 'Watch the base directory for changes'
 })
 
+cli.addArgument(['--nodelays', '-n'], {
+  action: 'storeTrue',
+  help: 'Ignores all delay settings in the mocks'
+})
+
 cli.addArgument(['directory'], {
   nargs: '?',
   defaultValue: './',
