@@ -45,15 +45,15 @@ cli.addArgument(['directory'], {
 })
 
 const args = cli.parseArgs()
-
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
-app(mocksDirectory, args)
 
-// exit gracefully
-function exit(signal) {
-  console.log(`Received signal: ${signal}, exiting`)
-  process.exit(0)
-}
+// start the app
+app(mocksDirectory, args).then((server) => {
+  const exit = (signal) => {
+    console.log(`Received signal: ${signal}, exiting`)
+    server.close()
+  }
 
-process.on('SIGINT', exit)
-process.on('SIGTERM', exit)
+  process.on('SIGINT', exit)
+  process.on('SIGTERM', exit)
+})
