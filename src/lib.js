@@ -114,7 +114,7 @@ function requestMeetsConditions(req, mock) {
   }
 
   const conditions = mock[SCHEMA_KEYS.conditions]
-  if (conditions === 'skip') return false
+  if (typeof conditions === 'boolean') return conditions
 
   // if any fail, its not a match
   for (const condition in conditions) {

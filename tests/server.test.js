@@ -59,6 +59,12 @@ describe('General', () => {
       .expect(204)
   })
 
+  test('boolean conditions', () => {
+    request(server)
+      .get('/api/bool')
+      .expect(201)
+  })
+
   test('mocks with delay', async () => {
     const start = Date.now()
     await request(server).get('/api/delay')
