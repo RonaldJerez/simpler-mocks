@@ -57,9 +57,7 @@ function onRemove(file) {
 function addFixture(file) {
   if (!file.startsWith('__fixtures__')) return
 
-  util.log('Added Fixture: ', file)
-
-  const match = file.match(/(\w+)\.ya?ml/i)
+  const match = file.match(/([_\.\-\w]+)\.ya?ml$/i)
   const key = match[1]
 
   const filePath = path.resolve(cache.mocksDirectory, file)
@@ -67,6 +65,8 @@ function addFixture(file) {
     file: filePath,
     new: true
   }
+
+  util.log('Added Fixture: ', key, file)
 }
 
 /**
