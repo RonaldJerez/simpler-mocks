@@ -93,7 +93,8 @@ function respond(ctx, mock) {
 
   if (mock[SCHEMA_KEYS.status]) {
     const mockStatus = mock[SCHEMA_KEYS.status]
-    ctx.status = mockStatus instanceof util.MockRegExp ? Number(mockStatus.data) : mockStatus
+    const statusValue = mockStatus instanceof util.MockRegExp ? mockStatus.data : mockStatus
+    ctx.status = Number(statusValue)
   }
 
   if (mock[SCHEMA_KEYS.headers]) ctx.set(mock[SCHEMA_KEYS.headers])
