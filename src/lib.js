@@ -13,7 +13,8 @@ const SCHEMA_KEYS = {
   conditions: ':conditions',
   status: ':status',
   headers: ':headers',
-  response: ':response'
+  response: ':response',
+  key: ':key'
 }
 
 const readFileAsync = promisify(fs.readFile)
@@ -59,6 +60,15 @@ async function loadYamlFile(fileName) {
     console.error(error.message)
   }
 
+  if (content) {
+    content = content.map((mock, index) => {
+      if (mockHasSchema(mock) && !mock[SCHEMA_KEYS.key]) {
+        mock[SCHEMA_KEYS.key] = `${fileName}[${index}]`
+      }
+      return mock
+    })
+  }
+
   return content
 }
 
@@ -97,6 +107,7 @@ function respond(ctx, mock) {
     ctx.status = Number(statusValue)
   }
 
+  ctx.set('Simpler-Mock-Match', mock[SCHEMA_KEYS.key])
   if (mock[SCHEMA_KEYS.headers]) ctx.set(mock[SCHEMA_KEYS.headers])
   if (mock[SCHEMA_KEYS.response]) ctx.body = mock[SCHEMA_KEYS.response]
 }

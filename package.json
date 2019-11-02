@@ -29,7 +29,7 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "start": "nodemon ./src/cli.js  -- -p 8080 './tests'",
+    "start": "nodemon ./src/cli.js -- -p 8080 './tests'",
     "samples": "node ./src/cli.js './samples'",
     "prof": "node --prof ./src/cli.js -p 8080 './tests'",
     "test": "jest --coverage",

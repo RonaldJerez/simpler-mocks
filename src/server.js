@@ -21,7 +21,7 @@ router.all('*', async (ctx, next) => {
   const mock = mocks.find((mock) => lib.requestMeetsConditions(ctx.request, mock))
 
   if (mock) {
-    if (mock[SCHEMA_KEYS.delay] && !skipDelays) {
+    if (!skipDelays) {
       await lib.delay(mock[SCHEMA_KEYS.delay], start)
     }
     lib.respond(ctx, mock)
