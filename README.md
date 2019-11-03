@@ -78,6 +78,7 @@ server('./samples', { port: 8080, watch: true })
                           open port if none is set.
     --silent, -s          Hides http access logs from the terminal.
     --watch, -w           Watch the base directory for changes
+    --nodelays, -n        Ignores all delay settings in the mocks
 ```
 
 ## YAML Schema

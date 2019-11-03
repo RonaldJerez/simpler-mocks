@@ -9,7 +9,7 @@ branches:
     - master
 
 install:
-  - travis_retry npm install
+  - travis_retry yarn install
 
 script:
   - npm test
