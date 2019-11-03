@@ -89,7 +89,14 @@ function addMock(file) {
   util.log('Added Mock: ', file)
 
   const match = file.match(/(.*)\.(ya?ml|json)/i)
-  const pattern = match[1].replace(/[^\w]_(?=\/|\.)/g, '/*')
+  let pattern = match[1].replace(/\/_(?=\/|\.)/g, '/*')
+
+  // support files with just the method inside a directory
+  // ex:  api/some/endpoint.get.yml same as api/some/endpoint/get.yml
+  if (pattern.indexOf('.') === -1) {
+    const slashPos = pattern.lastIndexOf('/')
+    pattern = pattern.slice(0, slashPos) + '.' + pattern.slice(slashPos + 1)
+  }
 
   const filePath = path.resolve(cache.mocksDirectory, file)
 
