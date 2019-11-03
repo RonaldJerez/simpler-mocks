@@ -52,6 +52,7 @@ app(mocksDirectory, args).then((server) => {
   const exit = (signal) => {
     console.log(`Received signal: ${signal}, exiting`)
     server.close()
+    process.exit()
   }
 
   process.on('SIGINT', exit)
