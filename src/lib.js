@@ -14,7 +14,8 @@ const SCHEMA_KEYS = {
   status: ':status',
   headers: ':headers',
   response: ':response',
-  key: ':key'
+  key: ':key',
+  cookies: ':cookies'
 }
 
 const readFileAsync = promisify(fs.readFile)
@@ -105,6 +106,13 @@ function respond(ctx, mock) {
     const mockStatus = mock[SCHEMA_KEYS.status]
     const statusValue = mockStatus instanceof util.MockRegExp ? mockStatus.data : mockStatus
     ctx.status = Number(statusValue)
+  }
+
+  // add cookies to the response
+  if (mock[SCHEMA_KEYS.cookies]) {
+    for (key of Object.keys(mock[SCHEMA_KEYS.cookies])) {
+      ctx.cookies.set(key, mock[SCHEMA_KEYS.cookies][key])
+    }
   }
 
   ctx.set('Simpler-Mock-Match', mock[SCHEMA_KEYS.key])

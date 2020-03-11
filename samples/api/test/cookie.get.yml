@@ -1,0 +1,4 @@
+:response:
+  something: true
+:cookies:
+  my-cookie-name: my-cookie-val
