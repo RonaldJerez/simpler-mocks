@@ -18,9 +18,19 @@ router.all('*', async (ctx, next) => {
   cache.request = ctx.request
 
   const mocks = (await lib.loadMockFile(ctx.method, ctx.path)) || []
-  const mock = mocks.find((mock) => lib.requestMeetsConditions(ctx.request, mock))
+  const mock = mocks.find((mock) => {
+    // give each mock a clear temp storage to start with
+    cache._storage = {}
+    return lib.requestMeetsConditions(ctx.request, mock)
+  })
 
   if (mock) {
+    // if there is anything in the temp storage, persist it
+    if (Object.keys(cache._storage).length) {
+      console.log(cache._storage)
+      Object.assign(cache.storage, cache._storage)
+    }
+
     if (!skipDelays) {
       await lib.delay(mock[SCHEMA_KEYS.delay], start)
     }

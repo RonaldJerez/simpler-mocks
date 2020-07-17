@@ -81,6 +81,58 @@ const AnyType = new yaml.Type('!any', {
   instanceOf: util.Any
 })
 
+// save some data for later use
+// format: !save key
+const Save__string = new yaml.Type('!save', {
+  kind: 'scalar',
+  resolve: (key) => typeof key === 'string',
+  construct: (key) => {
+    return new util.PersistItem(key)
+  }
+})
+
+// save some data for later use, if it matches
+// format: !save key: matcher
+const Save__object = new yaml.Type('!save', {
+  kind: 'mapping',
+  resolve: (data) => Object.keys(data).length === 1, // can only have one key
+  construct: (data) => {
+    const [key] = Object.keys(data)
+    return new util.PersistItem(key, data[key])
+  }
+})
+
+// save some data for later use with regexp (not implemented)
+// format: !save [key1, key2, regexp]
+// const Save__array = new yaml.Type('!save', {
+//   kind: 'sequence',
+//   // instanceOf: util.PersistItem,
+//   resolve: (data) => data.length > 2, // can only have one key
+//   construct: (data) => {
+//     const value = data.pop()
+//     return new util.PersistItem(data, value)
+//   }
+// })
+
+// retrieve persisted data from storage
+const Get__string = new yaml.Type('!get', {
+  kind: 'scalar',
+  resolve: (key) => typeof key === 'string',
+  construct: (key) => {
+    return new util.FetchItem(key)
+  }
+})
+
+// retrieve persisted data from storage
+const Get__object = new yaml.Type('!get', {
+  kind: 'mapping',
+  resolve: (data) => Object.keys(data).length === 1, // can only have one key
+  construct: (data) => {
+    const [key] = Object.keys(data)
+    return new util.FetchItem(key, data[key])
+  }
+})
+
 // custom !regexp tag, based on the original !!js/regexp tag definition
 const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2002:js/regexp']
 
@@ -96,5 +148,15 @@ delete mockRegExpOptions.tag
 delete mockRegExpOptions.predicate
 const MockRegExpType = new yaml.Type('!regexp', mockRegExpOptions)
 
-MOCK_TAGS = yaml.Schema.create([AnyType, ChanceType, IncludeType, RequestType, MockRegExpType])
+MOCK_TAGS = yaml.Schema.create([
+  AnyType,
+  ChanceType,
+  Get__string,
+  Get__object,
+  IncludeType,
+  MockRegExpType,
+  RequestType,
+  Save__string,
+  Save__object
+])
 module.exports = MOCK_TAGS

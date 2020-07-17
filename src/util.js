@@ -71,15 +71,27 @@ function keysToLower(source) {
  * @param {*} tester the tester (regexp or function)
  */
 function criteriaTester(val, tester) {
-  if (tester instanceof Any) {
+  if (tester instanceof PersistItem) {
+    const result = criteriaTester(val, tester.data)
+
+    if (result && tester.data instanceof CustomType) {
+      cache._storage[tester.key] = tester.data
+    }
+    console.log(result)
+    return result
+  } else if (tester instanceof Any) {
+    let result
     if (!tester.type) {
       // when no type is specify, we dont care for the actual value
-      return true
+      result = true
     } else if (tester.type === 'array') {
-      return Array.isArray(val)
+      result = Array.isArray(val)
     } else {
-      return typeof val === tester.type
+      result = typeof val === tester.type
+      console.log(result)
     }
+    result && (tester.data = val)
+    return result
   } else if (tester instanceof RegExp) {
     return tester.test(val)
   } else if (tester instanceof MockRegExp) {
@@ -95,18 +107,29 @@ function criteriaTester(val, tester) {
   }
 }
 
+class CustomType {
+  constructor(data) {
+    this.data = data
+  }
+
+  toJSON() {
+    return this.data
+  }
+}
+
 /**
  * @class
  * the Any class to be used to identify the custom !any tag
  *
  * @property {string} type
  */
-class Any {
+class Any extends CustomType {
   /**
    * constructors new Any
    * @param {string} type the type of data this tag will match, could be boolean|string|number|array
    */
   constructor(type) {
+    super()
     if (type) {
       this.type = type.toLowerCase()
     }
@@ -120,18 +143,43 @@ class Any {
  * @property {RegExp} pattern
  * @property {*} data the value of this object to be outputed using toJSON
  */
-class MockRegExp {
+class MockRegExp extends CustomType {
   /**
    * constructs new MockRegExp
    * @param {*} pattern the regexp pattern for this object
    */
   constructor(pattern) {
+    super(pattern)
     this.pattern = pattern
     this.data = pattern
   }
+}
+
+class PersistItem extends CustomType {
+  constructor(key, value) {
+    value = value || new Any()
+
+    super(value)
+    this.key = key
+  }
+}
+
+class FetchItem extends CustomType {
+  constructor(key, defaultVal) {
+    super()
+    this.key = key
+    this.default = defaultVal
+  }
 
   toJSON() {
-    return this.data
+    // gets an item from storage
+    // temp storage (current session) first, then the persisted storage
+    let item = cache._storage[this.key] || cache.storage[this.key] || this.default
+
+    if (item && item instanceof CustomType) {
+      item = item.toJSON()
+    }
+    return item
   }
 }
 
@@ -148,8 +196,10 @@ module.exports = {
   Any,
   areEqualSets,
   criteriaTester,
+  FetchItem,
   keysToLower,
   log,
+  MockRegExp,
   parseOptions,
-  MockRegExp
+  PersistItem
 }
