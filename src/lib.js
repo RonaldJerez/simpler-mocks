@@ -7,7 +7,7 @@ const isEqual = require('lodash.isequalwith')
 const cache = require('./cache')
 const util = require('./util')
 const types = require('./types')
-const MOCK_TAGS = require('./simpleMockTags')
+const CUSTOM_TAGS = require('./tags')
 
 const SCHEMA_KEYS = {
   delay: ':delay',
@@ -53,7 +53,7 @@ async function loadYamlFile(fileName) {
   const file = await readFileAsync(fileName, 'utf8')
 
   try {
-    content = yaml.load(file, { schema: MOCK_TAGS })
+    content = yaml.load(file, { schema: CUSTOM_TAGS })
     if (content && !Array.isArray(content)) {
       content = [content]
     }

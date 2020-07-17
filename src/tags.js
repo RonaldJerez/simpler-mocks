@@ -6,8 +6,8 @@ const cache = require('./cache')
 const util = require('./util')
 const types = require('./types')
 
-let MOCK_TAGS
 const chance = new Chance()
+let CUSTOM_TAGS
 
 // Example Custom Type
 // https://github.com/nodeca/js-yaml/blob/master/examples/custom_types.js
@@ -38,7 +38,7 @@ const Include = new yaml.Type('!include', {
 
       // parse the yaml code
       try {
-        output = yaml.safeLoad(fileContent, { schema: MOCK_TAGS })
+        output = yaml.safeLoad(fileContent, { schema: CUSTOM_TAGS })
       } catch (error) {
         /* istanbul ignore next */
         console.error(error.message)
@@ -134,7 +134,6 @@ const Get__object = new yaml.Type('!get', {
 
 // custom !regexp tag, based on the original !!js/regexp tag definition
 const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2002:js/regexp']
-
 const mockRegExpOptions = {
   ...jsRegExp,
   instanceOf: types.CustomRegExp,
@@ -147,7 +146,8 @@ delete mockRegExpOptions.tag
 delete mockRegExpOptions.predicate
 const CustomRegExp = new yaml.Type('!regexp', mockRegExpOptions)
 
-MOCK_TAGS = yaml.Schema.create([
+// ----------- //
+CUSTOM_TAGS = yaml.Schema.create([
   Any,
   Random,
   Get__string,
@@ -158,4 +158,4 @@ MOCK_TAGS = yaml.Schema.create([
   Save__string,
   Save__object
 ])
-module.exports = MOCK_TAGS
+module.exports = CUSTOM_TAGS
