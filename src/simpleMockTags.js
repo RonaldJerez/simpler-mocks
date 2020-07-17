@@ -4,6 +4,7 @@ const _get = require('lodash.get')
 const Chance = require('chance')
 const cache = require('./cache')
 const util = require('./util')
+const types = require('./types')
 
 let MOCK_TAGS
 const chance = new Chance()
@@ -13,7 +14,7 @@ const chance = new Chance()
 // kind: scalar = string, sequence = array, mapping = object
 
 // includes a fixture
-const IncludeType = new yaml.Type('!include', {
+const Include = new yaml.Type('!include', {
   kind: 'scalar',
   resolve: (data) => data !== null,
   construct: (name) => {
@@ -49,14 +50,14 @@ const IncludeType = new yaml.Type('!include', {
 })
 
 // gets data from the request object
-const RequestType = new yaml.Type('!request', {
+const Request = new yaml.Type('!request', {
   kind: 'scalar',
   resolve: (data) => data !== null,
   construct: (data) => _get(cache.request, data, {})
 })
 
 // generates random data using chance js
-const ChanceType = new yaml.Type('!random', {
+const Random = new yaml.Type('!random', {
   kind: 'scalar',
   resolve: (data) => data !== null,
   construct: (data) => {
@@ -75,19 +76,18 @@ const ChanceType = new yaml.Type('!random', {
 })
 
 // match any type of data
-const AnyType = new yaml.Type('!any', {
+const Any = new yaml.Type('!any', {
   kind: 'scalar',
-  construct: (data) => new util.Any(data),
-  instanceOf: util.Any
+  construct: (data) => new types.Any(data)
 })
 
 // save some data for later use
 // format: !save key
 const Save__string = new yaml.Type('!save', {
   kind: 'scalar',
-  resolve: (key) => typeof key === 'string',
+  resolve: (key) => key && typeof key === 'string',
   construct: (key) => {
-    return new util.PersistItem(key)
+    return new types.Save(key)
   }
 })
 
@@ -95,10 +95,10 @@ const Save__string = new yaml.Type('!save', {
 // format: !save key: matcher
 const Save__object = new yaml.Type('!save', {
   kind: 'mapping',
-  resolve: (data) => Object.keys(data).length === 1, // can only have one key
+  resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
   construct: (data) => {
     const [key] = Object.keys(data)
-    return new util.PersistItem(key, data[key])
+    return new types.Save(key, data[key])
   }
 })
 
@@ -106,30 +106,29 @@ const Save__object = new yaml.Type('!save', {
 // format: !save [key1, key2, regexp]
 // const Save__array = new yaml.Type('!save', {
 //   kind: 'sequence',
-//   // instanceOf: util.PersistItem,
 //   resolve: (data) => data.length > 2, // can only have one key
 //   construct: (data) => {
 //     const value = data.pop()
-//     return new util.PersistItem(data, value)
+//     return new types.Save(data, value)
 //   }
 // })
 
 // retrieve persisted data from storage
 const Get__string = new yaml.Type('!get', {
   kind: 'scalar',
-  resolve: (key) => typeof key === 'string',
+  resolve: (key) => key && typeof key === 'string',
   construct: (key) => {
-    return new util.FetchItem(key)
+    return new types.Get(key)
   }
 })
 
 // retrieve persisted data from storage
 const Get__object = new yaml.Type('!get', {
   kind: 'mapping',
-  resolve: (data) => Object.keys(data).length === 1, // can only have one key
+  resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
   construct: (data) => {
     const [key] = Object.keys(data)
-    return new util.FetchItem(key, data[key])
+    return new types.Get(key, data[key])
   }
 })
 
@@ -138,24 +137,24 @@ const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2
 
 const mockRegExpOptions = {
   ...jsRegExp,
-  instanceOf: util.MockRegExp,
+  instanceOf: types.CustomRegExp,
   construct: (data) => {
     const regexp = jsRegExp.construct(data)
-    return new util.MockRegExp(regexp)
+    return new types.CustomRegExp(regexp)
   }
 }
 delete mockRegExpOptions.tag
 delete mockRegExpOptions.predicate
-const MockRegExpType = new yaml.Type('!regexp', mockRegExpOptions)
+const CustomRegExp = new yaml.Type('!regexp', mockRegExpOptions)
 
 MOCK_TAGS = yaml.Schema.create([
-  AnyType,
-  ChanceType,
+  Any,
+  Random,
   Get__string,
   Get__object,
-  IncludeType,
-  MockRegExpType,
-  RequestType,
+  Include,
+  CustomRegExp,
+  Request,
   Save__string,
   Save__object
 ])

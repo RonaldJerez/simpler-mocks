@@ -19,21 +19,22 @@ router.all('*', async (ctx, next) => {
 
   const mocks = (await lib.loadMockFile(ctx.method, ctx.path)) || []
   const mock = mocks.find((mock) => {
-    // give each mock a clear temp storage to start with
+    // give each mock its own clean temp storage
     cache._storage = {}
     return lib.requestMeetsConditions(ctx.request, mock)
   })
 
   if (mock) {
-    // if there is anything in the temp storage, persist it
+    // we found a matching mock file, if there is anything
+    // to persit move it to the permenent location
     if (Object.keys(cache._storage).length) {
-      console.log(cache._storage)
       Object.assign(cache.storage, cache._storage)
     }
 
     if (!skipDelays) {
       await lib.delay(mock[SCHEMA_KEYS.delay], start)
     }
+
     lib.respond(ctx, mock)
   }
 
@@ -49,6 +50,7 @@ koa.use(router.allowedMethods())
 function server({ port = 0, silent = false, nodelays = false }) {
   skipDelays = nodelays
 
+  /* istanbul ignore next */
   if (!silent) {
     koa.use(logger())
   }

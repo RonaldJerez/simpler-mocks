@@ -1,17 +1,14 @@
 # responds with data from the query string
 - :conditions:
     body:
-      email:
-        !save nick: !regexp /(\w)@.*/i
+      email: !save { nick: !!js/function (val) => typeof val === 'string' }
       # email: !save nick
-      # email: !save username: !!js/regexp /(.*)@.*/
+      # email: !save { username: !!js/regexp /(.*)@.*/ }
   :response:
     output: !get nick
 
-- :condtions:
-    params.has: getter
+- :conditions:
   :response:
-    output:
-      !get nick: !random name
+    output: !get { nick: !random name }
 # !get nick
-# !get nick: default
+# !get { nick: default }

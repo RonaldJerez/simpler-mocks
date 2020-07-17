@@ -6,6 +6,7 @@ const isMatch = require('lodash.ismatchwith')
 const isEqual = require('lodash.isequalwith')
 const cache = require('./cache')
 const util = require('./util')
+const types = require('./types')
 const MOCK_TAGS = require('./simpleMockTags')
 
 const SCHEMA_KEYS = {
@@ -104,7 +105,7 @@ function respond(ctx, mock) {
 
   if (mock[SCHEMA_KEYS.status]) {
     const mockStatus = mock[SCHEMA_KEYS.status]
-    const statusValue = mockStatus instanceof util.MockRegExp ? mockStatus.data : mockStatus
+    const statusValue = mockStatus instanceof types.CustomType ? mockStatus.toJSON() : mockStatus
     ctx.status = Number(statusValue)
   }
 
@@ -178,10 +179,10 @@ function requestMeetsCriterias(request, criterias, modifiers) {
     }
   } else if (modifiers.includes('only')) {
     // request must match our criteria exactly
-    match = isEqual(request, criterias, util.criteriaTester)
+    match = isEqual(request, criterias, types.tester)
   } else {
     // partially match the request
-    match = isMatch(request, criterias, util.criteriaTester)
+    match = isMatch(request, criterias, types.tester)
   }
 
   return modifiers.includes('not') ? !match : match
