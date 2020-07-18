@@ -1,0 +1,20 @@
+- :conditions:
+    query.has: email
+  :response:
+    output: !get email
+
+- :conditions:
+    query.has: defaults
+  :response:
+    output: !get { state: 'NJ' }
+
+- :conditions:
+    query.has: notexist
+  :response:
+    output: !get nothing
+
+# conditions matches previously saved data
+- :conditions:
+    query:
+      zip: !get zip
+  :status: 201

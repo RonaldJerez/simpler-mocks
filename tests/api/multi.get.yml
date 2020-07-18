@@ -1,4 +1,4 @@
-- # this mock has a condtional matcher, only respond when
+- # this mock has a condtional matcher, only respond when it matches
   :conditions:
     query:
       which: first
@@ -6,8 +6,16 @@
   :response:
     mock: first
 
-- # setting conditions to skip will skip this mock
-  :conditions: skip
+- # can return cookies as well
+  :conditions:
+    query:
+      which: second
+  :status: 200
+  :cookies:
+    oreo: 'yes'
+
+- # setting conditions to false will skip this mock
+  :conditions: false
   :status: 200
 
 - # if nothing matches return this response

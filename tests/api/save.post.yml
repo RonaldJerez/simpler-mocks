@@ -1,0 +1,27 @@
+# saves any value
+- :conditions:
+    body:
+      name: !save name
+  :response:
+    output: !get name
+
+# saves if matches tester
+- :conditions:
+    body:
+      zipcode: !save { zip: !any number }
+  :response:
+    output: !get zip
+
+# saves regexp matches
+- :conditions:
+    body:
+      email: !save { email: !regexp '/(.*)@.*/' }
+  :response:
+    output: !get email
+
+# responds with array of array matches
+- :conditions:
+    body:
+      range: !save { range: !regexp '/(.*)-(.*)/' }
+  :response:
+    output: !get range

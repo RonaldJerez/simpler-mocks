@@ -47,6 +47,11 @@ describe('General', () => {
       .get('/api/multi?which=first')
       .expect({ mock: 'first' }))
 
+  test('can respond with cookies', () =>
+    request(server)
+      .get('/api/multi?which=second')
+      .expect('set-cookie', 'oreo=yes; path=/; httponly'))
+
   test('wildcard path sections', () => {
     request(server)
       .delete('/api/user/1233333/profle')
@@ -286,4 +291,61 @@ describe('Custom Tags', () => {
     request(server)
       .get('/api/tags?type=regexp2&pin=000202')
       .expect(202))
+})
+
+describe('Data persistance', () => {
+  test('matches anything', () =>
+    request(server)
+      .post('/api/save')
+      .send({ name: 'anything' })
+      .expect(200, { output: 'anything' }))
+
+  test('does not save if matcher fails', () =>
+    request(server)
+      .post('/api/save')
+      .send({ zipcode: 'abcd' })
+      .expect(404))
+
+  test('saves if matcher passes', () =>
+    request(server)
+      .post('/api/save')
+      .send({ zipcode: 12345 })
+      .expect(200, { output: 12345 }))
+
+  test('works with !regexp too', () =>
+    request(server)
+      .post('/api/save')
+      .send({ email: 'user@domain.com' })
+      .expect(200, { output: 'user' }))
+
+  test('returns multiple matches from regexp', () =>
+    request(server)
+      .post('/api/save')
+      .send({ range: '200-500' })
+      .expect(200, { output: ['200', '500'] }))
+
+  test('gets previously saved data', () =>
+    request(server)
+      .get('/api/get?email')
+      .expect(200, { output: 'user' }))
+
+  test('returns default if defined', () =>
+    request(server)
+      .get('/api/get?defaults')
+      .expect(200, { output: 'NJ' }))
+
+  test('returns undefined if nothing is saved', () =>
+    request(server)
+      .get('/api/get?notexist')
+      .expect(200, { output: null }))
+
+  test('check conditions against saved data', () =>
+    request(server)
+      .get('/api/get?zip=54333')
+      .expect(404))
+
+  test('check conditions against saved data', () =>
+    request(server)
+      .get('/api/get?zip=12345')
+      .expect(201))
 })

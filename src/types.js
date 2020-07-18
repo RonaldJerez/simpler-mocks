@@ -15,6 +15,7 @@ class CustomType {
    * @param {*} value - The value to test
    **/
   test(value) {
+    /* istanbul ignore next */
     return false
   }
 }
@@ -116,7 +117,7 @@ class Get extends CustomType {
   toJSON() {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
-    let item = cache._storage[this.key] || cache.storage[this.key] || this.default
+    let item = cache._storage[this.key] || cache.storage[this.key] || this.default || null
 
     if (item && item instanceof CustomType) {
       item = item.toJSON()
@@ -125,7 +126,9 @@ class Get extends CustomType {
   }
 
   test(value) {
-    return value === this.toJSON()
+    // purposely left as loose equality "==" so we can match
+    // query "strings" against their possibly non string counter parts
+    return value == this.toJSON()
   }
 }
 
