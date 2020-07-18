@@ -11,30 +11,16 @@ afterAll(() => {
 })
 
 describe('General', () => {
-  test('empty files', () =>
-    request(server)
-      .get('/api/empty')
-      .expect(404))
+  test('empty files', () => request(server).get('/api/empty').expect(404))
 
-  test('non existing endpoint', () =>
-    request(server)
-      .get('/api/non/existant')
-      .expect(404))
+  test('non existing endpoint', () => request(server).get('/api/non/existant').expect(404))
 
-  test('requests made to /', () =>
-    request(server)
-      .get('/')
-      .expect(200))
+  test('requests made to /', () => request(server).get('/').expect(200))
 
-  test('endpoint with deeper path', () =>
-    request(server)
-      .get('/api/deep/endpoint')
-      .expect(201))
+  test('endpoint with deeper path', () => request(server).get('/api/deep/endpoint').expect(201))
 
   test('reads documents with a single mock', () =>
-    request(server)
-      .get('/api/single')
-      .expect(200, { color: 'blue' }))
+    request(server).get('/api/single').expect(200, { color: 'blue' }))
 
   test('reads documents with multiple mocks', () =>
     request(server)
@@ -43,9 +29,7 @@ describe('General', () => {
       .expect('x-custom', 'custom header value'))
 
   test('pick the first mock that matches', () =>
-    request(server)
-      .get('/api/multi?which=first')
-      .expect({ mock: 'first' }))
+    request(server).get('/api/multi?which=first').expect({ mock: 'first' }))
 
   test('can respond with cookies', () =>
     request(server)
@@ -53,21 +37,15 @@ describe('General', () => {
       .expect('set-cookie', 'oreo=yes; path=/; httponly'))
 
   test('wildcard path sections', () => {
-    request(server)
-      .delete('/api/user/1233333/profle')
-      .expect(204)
+    request(server).delete('/api/user/1233333/profle').expect(204)
   })
 
   test('wildcard path sections', () => {
-    request(server)
-      .delete('/api/user/555555/profle')
-      .expect(204)
+    request(server).delete('/api/user/555555/profle').expect(204)
   })
 
   test('boolean conditions', () => {
-    request(server)
-      .get('/api/bool')
-      .expect(201)
+    request(server).get('/api/bool').expect(201)
   })
 
   test('mocks with delay', async () => {
@@ -111,10 +89,7 @@ describe('Response Content-Type', () => {
 
 describe('Matcher modifiers', () => {
   test('.has: string value', () =>
-    request(server)
-      .get('/api/modifier')
-      .set('x-has-single', 'anything')
-      .expect(201))
+    request(server).get('/api/modifier').set('x-has-single', 'anything').expect(201))
 
   test('.has: array value', () =>
     request(server)
@@ -123,33 +98,17 @@ describe('Matcher modifiers', () => {
       .set('x-has-two', 'anything')
       .expect(202))
 
-  test('.only', () =>
-    request(server)
-      .post('/api/modifier')
-      .send({ one: 1 })
-      .expect(204))
+  test('.only', () => request(server).post('/api/modifier').send({ one: 1 }).expect(204))
 
   test('.only, extra content', () =>
-    request(server)
-      .post('/api/modifier')
-      .send({ one: 1, two: 2 })
-      .expect(404))
+    request(server).post('/api/modifier').send({ one: 1, two: 2 }).expect(404))
 
-  test('.not', () =>
-    request(server)
-      .post('/api/modifier')
-      .send({ one: 1, three: 3 })
-      .expect(203))
+  test('.not', () => request(server).post('/api/modifier').send({ one: 1, three: 3 }).expect(203))
 
-  test('.only.has', () =>
-    request(server)
-      .get('/api/modifier?item1=true&item2=true')
-      .expect(203))
+  test('.only.has', () => request(server).get('/api/modifier?item1=true&item2=true').expect(203))
 
   test('.only.has, extra content', () =>
-    request(server)
-      .get('/api/modifier?item1=true&item2=true&item3=true')
-      .expect(404))
+    request(server).get('/api/modifier?item1=true&item2=true&item3=true').expect(404))
 })
 
 describe('Non SCHEMA files', () => {
@@ -173,40 +132,21 @@ describe('Non SCHEMA files', () => {
 })
 
 describe('Testers', () => {
-  test('RegExp Passed', () =>
-    request(server)
-      .get('/api/testers?code=12-345')
-      .expect(201))
+  test('RegExp Passed', () => request(server).get('/api/testers?code=12-345').expect(201))
 
-  test('RegExp Failed', () =>
-    request(server)
-      .get('/api/testers?code=12345')
-      .expect(400))
+  test('RegExp Failed', () => request(server).get('/api/testers?code=12345').expect(400))
 
-  test('Function Passed', () =>
-    request(server)
-      .get('/api/testers?code=5')
-      .expect(202))
+  test('Function Passed', () => request(server).get('/api/testers?code=5').expect(202))
 
-  test('Function Failed', () =>
-    request(server)
-      .get('/api/testers?code=20')
-      .expect(400))
+  test('Function Failed', () => request(server).get('/api/testers?code=20').expect(400))
 })
 
 describe('Case Insenstive Headers', () => {
   test('With Objects', () =>
-    request(server)
-      .get('/api/headers')
-      .set('x-name', 'one')
-      .set('x-PROP', 'two')
-      .expect(201))
+    request(server).get('/api/headers').set('x-name', 'one').set('x-PROP', 'two').expect(201))
 
   test('With Strings', () =>
-    request(server)
-      .get('/api/headers')
-      .set('x-PROP', 'anything')
-      .expect(202))
+    request(server).get('/api/headers').set('x-PROP', 'anything').expect(202))
 
   test('With Sets', () =>
     request(server)
@@ -218,15 +158,10 @@ describe('Case Insenstive Headers', () => {
 
 describe('Custom Tags', () => {
   test('!request query', () =>
-    request(server)
-      .get('/api/tags?input=hello')
-      .expect(200, { output: 'hello' }))
+    request(server).get('/api/tags?input=hello').expect(200, { output: 'hello' }))
 
   test('!request headers', () =>
-    request(server)
-      .get('/api/tags')
-      .set('x-test', 123)
-      .expect(200, { output: '123' }))
+    request(server).get('/api/tags').set('x-test', 123).expect(200, { output: '123' }))
 
   test('!random', () =>
     request(server)
@@ -240,14 +175,10 @@ describe('Custom Tags', () => {
       }))
 
   test('!include, fixture exists', () =>
-    request(server)
-      .get('/api/tags?type=good-include')
-      .expect(200))
+    request(server).get('/api/tags?type=good-include').expect(200))
 
   test('!include, fixture does not exists', () =>
-    request(server)
-      .get('/api/tags?type=bad-include')
-      .expect(404))
+    request(server).get('/api/tags?type=bad-include').expect(404))
 
   test('!any, correct data', () =>
     request(server)
@@ -288,9 +219,7 @@ describe('Custom Tags', () => {
       .expect(200, { data: ['rocket', 'guardians'] }))
 
   test('!regexp, status', () =>
-    request(server)
-      .get('/api/tags?type=regexp2&pin=000202')
-      .expect(202))
+    request(server).get('/api/tags?type=regexp2&pin=000202').expect(202))
 })
 
 describe('Data persistance', () => {
@@ -301,16 +230,10 @@ describe('Data persistance', () => {
       .expect(200, { output: 'anything' }))
 
   test('does not save if matcher fails', () =>
-    request(server)
-      .post('/api/save')
-      .send({ zipcode: 'abcd' })
-      .expect(404))
+    request(server).post('/api/save').send({ zipcode: 'abcd' }).expect(404))
 
   test('saves if matcher passes', () =>
-    request(server)
-      .post('/api/save')
-      .send({ zipcode: 12345 })
-      .expect(200, { output: 12345 }))
+    request(server).post('/api/save').send({ zipcode: 12345 }).expect(200, { output: 12345 }))
 
   test('works with !regexp too', () =>
     request(server)
@@ -331,27 +254,17 @@ describe('Data persistance', () => {
       .expect(200, { language: 'en', country: 'US' }))
 
   test('gets previously saved data', () =>
-    request(server)
-      .get('/api/get?email')
-      .expect(200, { output: 'user' }))
+    request(server).get('/api/get?email').expect(200, { output: 'user' }))
 
   test('returns default if defined', () =>
-    request(server)
-      .get('/api/get?defaults')
-      .expect(200, { output: 'NJ' }))
+    request(server).get('/api/get?defaults').expect(200, { output: 'NJ' }))
 
   test('returns undefined if nothing is saved', () =>
-    request(server)
-      .get('/api/get?notexist')
-      .expect(200, { output: null }))
+    request(server).get('/api/get?notexist').expect(200, { output: null }))
 
   test('check conditions against saved data', () =>
-    request(server)
-      .get('/api/get?zip=54333')
-      .expect(404))
+    request(server).get('/api/get?zip=54333').expect(404))
 
   test('check conditions against saved data', () =>
-    request(server)
-      .get('/api/get?zip=12345')
-      .expect(201))
+    request(server).get('/api/get?zip=12345').expect(201))
 })

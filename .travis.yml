@@ -1,15 +1,18 @@
+os: linux
 language: node_js
 
 node_js:
   - '10'
-  - '8'
+  - node
+  - lts/*
 
 branches:
   only:
     - master
+    - beta
+    - next
 
-install:
-  - travis_retry yarn install
+install: travis_retry yarn install
 
 script:
   - npm test
@@ -19,5 +22,4 @@ jobs:
   include:
     - stage: release
       node_js: lts/*
-      script:
-        - npx semantic-release
+      script: npx semantic-release

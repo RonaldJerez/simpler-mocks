@@ -10,7 +10,7 @@ const router = new Router()
 let skipDelays = false
 
 // catch all requests
-router.all('*', async (ctx, next) => {
+router.all('(.*)', async (ctx, next) => {
   const start = Date.now()
 
   // cache the current request before loading the yml file
@@ -55,7 +55,7 @@ function server({ port = 0, silent = false, nodelays = false }) {
     koa.use(logger())
   }
 
-  const instance = koa.listen(port, function() {
+  const instance = koa.listen(port, function () {
     console.log(`\nSimpler-Mocks running at: http://localhost:${this.address().port}`)
     console.log(`Serving files from: ${cache.mocksDirectory}\n`)
   })
