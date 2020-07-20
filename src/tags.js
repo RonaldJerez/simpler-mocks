@@ -1,12 +1,11 @@
 const fs = require('fs')
 const yaml = require('js-yaml')
 const _get = require('lodash.get')
-const Chance = require('chance')
+const chance = require('chance').Chance()
 const cache = require('./cache')
 const util = require('./util')
 const types = require('./types')
 
-const chance = new Chance()
 let CUSTOM_TAGS
 
 // Example Custom Type
@@ -14,9 +13,9 @@ let CUSTOM_TAGS
 // kind: scalar = string, sequence = array, mapping = object
 
 // includes a fixture
-const Include = new yaml.Type('!include', {
+const Include__string = new yaml.Type('!include', {
   kind: 'scalar',
-  resolve: (data) => data !== null,
+  resolve: (data) => data,
   construct: (name) => {
     let fileContent, output
     const fixture = cache.fixtures[name]
@@ -50,33 +49,76 @@ const Include = new yaml.Type('!include', {
 })
 
 // gets data from the request object
-const Request = new yaml.Type('!request', {
+const Request__string = new yaml.Type('!request', {
   kind: 'scalar',
-  resolve: (data) => data !== null,
+  resolve: (data) => data,
   construct: (data) => _get(cache.request, data, {})
 })
 
-// generates random data using chance js
-const Random = new yaml.Type('!random', {
+/**
+ * generates random data using chance js without any params
+ *
+ * @example !random character => chance.character()
+ * @see https://chancejs.com/
+ */
+const Random__string = new yaml.Type('!random', {
   kind: 'scalar',
-  resolve: (data) => data !== null,
+  resolve: (name) => name,
+  construct: (name) => {
+    return new types.Random(name)
+  }
+})
+
+/**
+ * generates random data using chance js, passing it a single param
+ *
+ * @example !random natural: {min: 1, max: 20}  => chance.natura({min: 1, max: 20})
+ * @see https://chancejs.com/
+ */
+const Random__object = new yaml.Type('!random', {
+  kind: 'mapping',
+  resolve: (data) => data && Object.keys(data).length === 1,
   construct: (data) => {
-    let type, options
-    const indexOfSpace = data.indexOf(' ')
+    const [name] = Object.keys(data)
+    return new types.Random(name, data[name])
+  }
+})
 
-    if (indexOfSpace == -1) {
-      type = data
-    } else {
-      type = data.substring(0, indexOfSpace)
-      options = util.parseOptions(data.substring(indexOfSpace))
+/**
+ * generates random data using chance js, with a multiple params
+ *
+ * @example !random [pad, 45, 5]  => chance.pad(45, 5)
+ * @see https://chancejs.com/
+ */
+const Random__array = new yaml.Type('!random', {
+  kind: 'sequence',
+  resolve: (data) => data && data.length > 1,
+  construct: (data) => {
+    const name = data.shift()
+    return new types.Random(name, data)
+  }
+})
+
+/**
+ * returns a reference to function in chance js
+ * this is useful for chance functions that accept functions as parameters
+ *
+ * @example !random [ unique, !chance state, 5 ]
+ */
+const Chance__string = new yaml.Type('!chance', {
+  kind: 'scalar',
+  resolve: (name) => name,
+  construct: (name) => {
+    if (!chance[name]) {
+      console.warn(`Chance does not contain a ${name} function`)
+      return
     }
-
-    return chance[type] ? chance[type](options) : undefined
+    return chance[name]
   }
 })
 
 // match any type of data
-const Any = new yaml.Type('!any', {
+const Any__string = new yaml.Type('!any', {
   kind: 'scalar',
   construct: (data) => new types.Any(data)
 })
@@ -92,7 +134,7 @@ const Save__string = new yaml.Type('!save', {
 })
 
 // save some data for later use, if it matches
-// format: !save key: matcher
+// format: !save { key: matcher }
 const Save__object = new yaml.Type('!save', {
   kind: 'mapping',
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
@@ -145,17 +187,20 @@ const mockRegExpOptions = {
 }
 delete mockRegExpOptions.tag
 delete mockRegExpOptions.predicate
-const CustomRegExp = new yaml.Type('!regexp', mockRegExpOptions)
+const RegExp__string = new yaml.Type('!regexp', mockRegExpOptions)
 
 // ----------- //
 CUSTOM_TAGS = yaml.Schema.create([
-  Any,
-  Random,
+  Any__string,
+  Chance__string,
   Get__string,
   Get__object,
-  Include,
-  CustomRegExp,
-  Request,
+  Include__string,
+  Random__array,
+  Random__object,
+  Random__string,
+  RegExp__string,
+  Request__string,
   Save__array,
   Save__string,
   Save__object

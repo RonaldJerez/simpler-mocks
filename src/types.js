@@ -1,4 +1,5 @@
 const cache = require('./cache')
+const chance = require('chance').Chance()
 
 class CustomType {
   constructor(data) {
@@ -167,21 +168,44 @@ class Get extends CustomType {
     this.default = defaultVal
   }
 
-  toJSON() {
+  _getValue(json) {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
     let item = cache._storage[this.key] || cache.storage[this.key]
 
     if (item && item instanceof CustomType) {
-      item = item.toJSON()
+      item = json ? item.toJSON() : item.data
     }
     return item || this.default || null
+  }
+
+  toJSON() {
+    return this._getValue(true)
+  }
+
+  valueOf() {
+    return this._getValue()
   }
 
   test(value) {
     // purposely left as loose equality "==" so we can match
     // query "strings" against their possibly non string counter parts
     return value == this.toJSON()
+  }
+}
+
+class Random {
+  constructor(funcName, params) {
+    this.funcName = funcName
+    this.params = params && !Array.isArray(params) ? [params] : params
+  }
+
+  toJSON() {
+    if (!chance[this.funcName]) {
+      console.warn(`Chance does not contain a '${this.funcName}' function`)
+      return
+    }
+    return chance[this.funcName].apply(chance, this.params)
   }
 }
 
@@ -208,5 +232,6 @@ module.exports = {
   CustomType,
   Get,
   Save,
+  Random,
   tester
 }

@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "argparse": "^1.0.10",
-    "chance": "^1.0.18",
+    "chance": "^1.1.6",
     "chokidar": "^3.4.1",
     "globby": "^11.0.1",
     "js-yaml": "^3.14.0",
@@ -54,6 +54,7 @@
     "minimatch": "^3.0.4"
   },
   "devDependencies": {
+    "commitizen": "^4.1.2",
     "coveralls": "^3.1.0",
     "cz-conventional-changelog": "^3.2.0",
     "husky": "^4.2.5",
@@ -73,11 +74,12 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "cz-conventional-changelog"
     }
   },
   "husky": {
     "hooks": {
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
       "pre-commit": "npx pretty-quick --staged",
       "pre-push": "yarn test"
     }
