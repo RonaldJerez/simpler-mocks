@@ -75,6 +75,19 @@ class CustomRegExp extends CustomType {
 
   test(value) {
     const matches = this.pattern.exec(value)
+    const result = !!matches
+
+    // if we found a match, save as the value of this instance
+    if (result) {
+      if (matches.length > 1) {
+        // If there were groups in the regexp, store it.
+        // if only one group, save that as single value, otherwise save just the group results
+        this.data = matches.length === 2 ? matches[1] : matches.slice(1)
+      } else {
+        // when there's no grouping, just save wheter the regexp was successful
+        this.data = result
+      }
+    }
 
     // if we found a match, save as the value of this instance
     if (matches && matches.length > 1) {
@@ -86,11 +99,11 @@ class CustomRegExp extends CustomType {
 }
 
 class Save extends CustomType {
-  constructor(key, value) {
+  constructor(keys, value) {
     value = value || new Any()
 
     super(value)
-    this.key = key
+    this.keys = keys
   }
 
   test(value) {
@@ -99,11 +112,51 @@ class Save extends CustomType {
     if (result) {
       // found a match, save it to the temp storage
       // the server code is responsible for storing it to a permenent location
-      const isCustom = this.data instanceof CustomType
-      cache._storage[this.key] = isCustom ? this.data : result
+      const isCustomType = this.data instanceof CustomType
+      const dataToStore = isCustomType ? this.data : result
+
+      if (Array.isArray(this.keys)) {
+        this.keys.forEach((key, index) => {
+          cache._storage[key] = new StoredIndexItem(index, dataToStore)
+        })
+      } else {
+        cache._storage[this.keys] = dataToStore
+      }
     }
 
     return result
+  }
+}
+
+/**
+ * Custom data type used in conjuction with save, in order to
+ * point data to a specifc index.
+ */
+class StoredIndexItem extends CustomType {
+  /**
+   *
+   * @param {*} index - the index in the array where the value we want is stored.
+   * @param {*} data - the customtype item we want to store
+   */
+  constructor(index, data) {
+    /* istanbul ignore next */
+    if (!data || isNaN(index)) {
+      throw new Error('Stored index items need an index and a value')
+    }
+    super(data)
+    this.index = index
+  }
+
+  toJSON() {
+    const isCustomType = this.data instanceof CustomType
+    const data = isCustomType ? this.data.toJSON() : this.data
+
+    if (Array.isArray(data)) {
+      return data[this.index]
+    }
+
+    console.warn(`Could not access index '${this.index} of non array.`)
+    return data
   }
 }
 
@@ -117,12 +170,12 @@ class Get extends CustomType {
   toJSON() {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
-    let item = cache._storage[this.key] || cache.storage[this.key] || this.default || null
+    let item = cache._storage[this.key] || cache.storage[this.key]
 
     if (item && item instanceof CustomType) {
       item = item.toJSON()
     }
-    return item
+    return item || this.default || null
   }
 
   test(value) {

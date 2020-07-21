@@ -324,6 +324,12 @@ describe('Data persistance', () => {
       .send({ range: '200-500' })
       .expect(200, { output: ['200', '500'] }))
 
+  test('stores groups from regexp seperately', () =>
+    request(server)
+      .post('/api/save')
+      .send({ locale: 'en-US' })
+      .expect(200, { language: 'en', country: 'US' }))
+
   test('gets previously saved data', () =>
     request(server)
       .get('/api/get?email')

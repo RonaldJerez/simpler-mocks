@@ -25,3 +25,11 @@
       range: !save { range: !regexp '/(.*)-(.*)/' }
   :response:
     output: !get range
+
+# can save multiple data points from !regexp groups
+- :conditions:
+    body:
+      locale: !save [language, country, !regexp '/([a-z]{2})-([A-Z]{2})/']
+  :response:
+    language: !get language
+    country: !get country

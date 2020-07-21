@@ -103,15 +103,16 @@ const Save__object = new yaml.Type('!save', {
 })
 
 // save some data for later use with regexp (not implemented)
-// format: !save [key1, key2, regexp]
-// const Save__array = new yaml.Type('!save', {
-//   kind: 'sequence',
-//   resolve: (data) => data.length > 2, // can only have one key
-//   construct: (data) => {
-//     const value = data.pop()
-//     return new types.Save(data, value)
-//   }
-// })
+// format: !save [key1, key2, matcher]
+const Save__array = new yaml.Type('!save', {
+  kind: 'sequence',
+  resolve: (data) => data && data.length > 1, // need a key and a matcher
+  construct: (data) => {
+    const value = data.pop()
+    const key = data.length == 1 ? data[0] : data
+    return new types.Save(key, value)
+  }
+})
 
 // retrieve persisted data from storage
 const Get__string = new yaml.Type('!get', {
@@ -155,6 +156,7 @@ CUSTOM_TAGS = yaml.Schema.create([
   Include,
   CustomRegExp,
   Request,
+  Save__array,
   Save__string,
   Save__object
 ])
