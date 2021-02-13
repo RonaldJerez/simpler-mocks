@@ -12,7 +12,16 @@ let CUSTOM_TAGS
 // https://github.com/nodeca/js-yaml/blob/master/examples/custom_types.js
 // kind: scalar = string, sequence = array, mapping = object
 
-// includes a fixture
+/**
+ * Includes another yaml file into the response
+ *
+ * @example
+ * ```yaml
+ * profile:
+ *   address: !include address
+ *   settings: !include settings
+ * ```
+ */
 const Include__string = new yaml.Type('!include', {
   kind: 'scalar',
   resolve: (data) => data,
@@ -48,7 +57,16 @@ const Include__string = new yaml.Type('!include', {
   }
 })
 
-// gets data from the request object
+/**
+ * Gets data from Koa's HTTP request. It uses lodash get so you can use
+ * dot notation to access deep elements.
+ *
+ * @example
+ * ```yaml
+ * origin: !request origin
+ * query: !request query.search
+ * ```
+ */
 const Request__string = new yaml.Type('!request', {
   kind: 'scalar',
   resolve: (data) => data,
@@ -58,7 +76,11 @@ const Request__string = new yaml.Type('!request', {
 /**
  * generates random data using chance js without any params
  *
- * @example !random character => chance.character()
+ * @example
+ * ```yaml
+ * fullname : !random name
+ * birthday : !random birthday
+ * ```
  * @see https://chancejs.com/
  */
 const Random__string = new yaml.Type('!random', {
@@ -72,7 +94,10 @@ const Random__string = new yaml.Type('!random', {
 /**
  * generates random data using chance js, passing it a single param
  *
- * @example !random natural: {min: 1, max: 20}  => chance.natura({min: 1, max: 20})
+ * @example
+ * ```yaml
+ * number: !random natural: {min: 1, max: 20}
+ * ```
  * @see https://chancejs.com/
  */
 const Random__object = new yaml.Type('!random', {
@@ -87,7 +112,7 @@ const Random__object = new yaml.Type('!random', {
 /**
  * generates random data using chance js, with a multiple params
  *
- * @example !random [pad, 45, 5]  => chance.pad(45, 5)
+ * @example !random [pad, 45, 5]
  * @see https://chancejs.com/
  */
 const Random__array = new yaml.Type('!random', {
@@ -117,14 +142,33 @@ const Chance__string = new yaml.Type('!chance', {
   }
 })
 
-// match any type of data
+/**
+ * Matches conditions based on data type
+ *
+ * format: !any type
+ *
+ * @example
+ * ```yaml
+ * name: !any string
+ * states: !any array
+ * ```
+ */
 const Any__string = new yaml.Type('!any', {
   kind: 'scalar',
   construct: (data) => new types.Any(data)
 })
 
-// save some data for later use
-// format: !save key
+/**
+ * Stores data from a request to be retrieved using !get in the current response or later
+ * Saves the data under the given key.
+ *
+ * format: !save key
+ *
+ * @example
+ * ```yaml
+ * name: !save first_name
+ * ```
+ */
 const Save__string = new yaml.Type('!save', {
   kind: 'scalar',
   resolve: (key) => key && typeof key === 'string',
@@ -133,8 +177,17 @@ const Save__string = new yaml.Type('!save', {
   }
 })
 
-// save some data for later use, if it matches
-// format: !save { key: matcher }
+/**
+ * Stores data from a request to be retrieved using !get in the current response or later
+ * Saves the data under the given key only if the matcher returns true
+ *
+ * format: !save { key: matcher }
+ *
+ * @example
+ * ```yaml
+ * name: !save { first_name: !any string }
+ * ```
+ */
 const Save__object = new yaml.Type('!save', {
   kind: 'mapping',
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
@@ -146,6 +199,22 @@ const Save__object = new yaml.Type('!save', {
 
 // save some data for later use with regexp (not implemented)
 // format: !save [key1, key2, matcher]
+/**
+ * Stores data from a request to be retrieved using !get in the current response or later
+ * Saves data under multiple keys if the value is an array, can also be used in conjunction with !regexp
+ * since that also returns an array.
+ *
+ * format: !save [key1, key2, matcher]
+ *
+ * @example
+ * ```yaml
+ * locale: !save [country, language, [US, en]]
+ * name: !save
+ *  - firstname
+ *  - lastname
+ *  - !regexp /(\w+)\s(\w+)/
+ * ```
+ */
 const Save__array = new yaml.Type('!save', {
   kind: 'sequence',
   resolve: (data) => data && data.length > 1, // need a key and a matcher
@@ -156,7 +225,17 @@ const Save__array = new yaml.Type('!save', {
   }
 })
 
-// retrieve persisted data from storage
+/**
+ * Retrieves the value of data that has been persisted using !save
+ * If nothing has been saved under that key it returns null
+ *
+ * format: !get key
+ *
+ * @example
+ * ```yaml
+ * name: !get firstname
+ * ```
+ */
 const Get__string = new yaml.Type('!get', {
   kind: 'scalar',
   resolve: (key) => key && typeof key === 'string',
@@ -165,7 +244,17 @@ const Get__string = new yaml.Type('!get', {
   }
 })
 
-// retrieve persisted data from storage
+/**
+ * Retrieves the value of data that has been persisted using !save
+ * Retrieves the given key or defaults to the given value if nothing has been saved
+ *
+ * format: !get key: default
+ *
+ * @example
+ * ```yaml
+ * name: !get firstname: john
+ * ```
+ */
 const Get__object = new yaml.Type('!get', {
   kind: 'mapping',
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
@@ -175,7 +264,10 @@ const Get__object = new yaml.Type('!get', {
   }
 })
 
-// custom !regexp tag, based on the original !!js/regexp tag definition
+/**
+ * Custom !regexp tag, based on the original !!js/regexp tag definition
+ * however if the regexp has groups it allows us to store those groups in
+ */
 const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2002:js/regexp']
 const mockRegExpOptions = {
   ...jsRegExp,
