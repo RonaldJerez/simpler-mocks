@@ -90,12 +90,7 @@ class CustomRegExp extends CustomType {
       }
     }
 
-    // if we found a match, save as the value of this instance
-    if (matches && matches.length > 1) {
-      this.data = matches.length === 2 ? matches[1] : matches.slice(1)
-    }
-
-    return !!matches
+    return result
   }
 }
 
