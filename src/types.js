@@ -166,12 +166,17 @@ class Get extends CustomType {
   _getValue(json) {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
-    let item = cache._storage[this.key] || cache.storage[this.key]
+    let item = cache._storage[this.key] || cache.storage[this.key] || this.default
 
-    if (item && item instanceof CustomType) {
-      item = json ? item.toJSON() : item.data
+    if (item) {
+      if (item instanceof CustomType) {
+        item = json ? item.toJSON() : item.data
+      } else if (item instanceof Random) {
+        item = json ? item.toJSON() : item
+      }
     }
-    return item || this.default || null
+
+    return item || null
   }
 
   toJSON() {

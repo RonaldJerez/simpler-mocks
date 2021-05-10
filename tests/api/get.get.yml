@@ -13,6 +13,11 @@
   :response:
     output: !get nothing
 
+- :conditions:
+    query.has: random
+  :response:
+    output: !get { randomZip: !random zip }
+
 # conditions matches previously saved data
 - :conditions:
     query:

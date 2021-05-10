@@ -262,6 +262,10 @@ describe('Data persistance', () => {
   test('returns undefined if nothing is saved', () =>
     request(server).get('/api/get?notexist').expect(200, { output: null }))
 
+  // TODO figure out how to test random data with regexp
+  test.skip('returns random generated data as default', () =>
+    request(server).get('/api/get?random').expect(200, { output: /\d{5}/ }))
+
   test('check conditions against saved data', () =>
     request(server).get('/api/get?zip=54333').expect(404))
 
