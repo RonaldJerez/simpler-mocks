@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "argparse": "^1.0.10",
-    "chance": "^1.1.6",
+    "chance": "^1.1.7",
     "chokidar": "^3.4.1",
     "globby": "^11.0.1",
     "js-yaml": "^3.14.0",
