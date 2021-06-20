@@ -163,28 +163,34 @@ class Get extends CustomType {
     this.default = defaultVal
   }
 
-  _getValue(json) {
+  _retrieveFromCache(json) {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
-    let item = cache._storage[this.key] || cache.storage[this.key] || this.default
+    let item = cache._storage[this.key] || cache.storage[this.key]
+    let value = this._getValue(item, json) || this._getValue(this.default, json)
+    return value || null
+  }
 
-    if (item) {
-      if (item instanceof CustomType) {
-        item = json ? item.toJSON() : item.data
-      } else if (item instanceof Random) {
-        item = json ? item.toJSON() : item
-      }
+  _getValue(item, json) {
+    if (!item) return
+
+    let value = item
+
+    if (json && typeof item.toJSON === 'function') {
+      value = item.toJSON()
+    } else if (item instanceof CustomType) {
+      value = item.data
     }
 
-    return item || null
+    return value
   }
 
   toJSON() {
-    return this._getValue(true)
+    return this._retrieveFromCache(true)
   }
 
   valueOf() {
-    return this._getValue()
+    return this._retrieveFromCache()
   }
 
   test(value) {
