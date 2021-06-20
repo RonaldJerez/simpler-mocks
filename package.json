@@ -35,8 +35,7 @@
     "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
     "semantic-release": "semantic-release",
-    "pretty": "prettier --write \"{src,tests}/**/*.js\"",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
+    "pretty": "prettier --write \"{src,tests}/**/*.js\""
   },
   "dependencies": {
     "argparse": "^1.0.10",
@@ -55,7 +54,6 @@
   },
   "devDependencies": {
     "commitizen": "^4.1.2",
-    "coveralls": "^3.1.0",
     "cz-conventional-changelog": "^3.2.0",
     "husky": "^4.2.5",
     "jest": "^26.1.0",
