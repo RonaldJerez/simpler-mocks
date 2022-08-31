@@ -35,7 +35,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watchAll --coverage",
     "semantic-release": "semantic-release",
-    "pretty": "prettier --write \"{src,tests}/**/*.js\""
+    "pretty": "prettier --write \"{src,tests}/**/*.js\"",
+    "prepare": "husky install"
   },
   "dependencies": {
     "argparse": "^1.0.10",
@@ -55,7 +56,7 @@
   "devDependencies": {
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
-    "husky": "^4.2.5",
+    "husky": "^8.0.0",
     "jest": "^26.1.0",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5",
@@ -73,13 +74,6 @@
   "config": {
     "commitizen": {
       "path": "cz-conventional-changelog"
-    }
-  },
-  "husky": {
-    "hooks": {
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true",
-      "pre-commit": "npx pretty-quick --staged",
-      "pre-push": "yarn test"
     }
   }
 }
