@@ -26,13 +26,6 @@
 
 - :conditions:
     query:
-      type: random2
-  :response:
-    name: !random [name, { middle: true }]
-    city: !random bleh
-
-- :conditions:
-    query:
       type: good-include
   :response:
     address: !include address

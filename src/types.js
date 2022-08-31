@@ -204,14 +204,19 @@ class Random {
   constructor(funcName, params) {
     this.funcName = funcName
     this.params = params && !Array.isArray(params) ? [params] : params
+    this.generateValue()
   }
 
-  toJSON() {
+  generateValue() {
     if (!chance[this.funcName]) {
       console.warn(`Chance does not contain a '${this.funcName}' function`)
       return
     }
-    return chance[this.funcName].apply(chance, this.params)
+    this.generatedValue = chance[this.funcName].apply(chance, this.params)
+  }
+
+  toJSON() {
+    return this.generatedValue
   }
 }
 
