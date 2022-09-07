@@ -1,5 +1,6 @@
 const fs = require('fs')
 const yaml = require('js-yaml')
+const jsTypes = require('js-yaml-js-types')
 const _get = require('lodash.get')
 const chance = require('chance').Chance()
 const cache = require('./cache')
@@ -46,7 +47,7 @@ const Include__string = new yaml.Type('!include', {
 
       // parse the yaml code
       try {
-        output = yaml.safeLoad(fileContent, { schema: CUSTOM_TAGS })
+        output = yaml.load(fileContent, { schema: CUSTOM_TAGS })
       } catch (error) {
         /* istanbul ignore next */
         console.error(error.message)
@@ -268,21 +269,20 @@ const Get__object = new yaml.Type('!get', {
  * Custom !regexp tag, based on the original !!js/regexp tag definition
  * however if the regexp has groups it allows us to store those groups in
  */
-const jsRegExp = yaml.DEFAULT_FULL_SCHEMA.compiledTypeMap.scalar['tag:yaml.org,2002:js/regexp']
 const mockRegExpOptions = {
-  ...jsRegExp,
+  ...jsTypes.regexp.options,
   instanceOf: types.CustomRegExp,
   construct: (data) => {
-    const regexp = jsRegExp.construct(data)
+    const regexp = jsTypes.regexp.construct(data)
     return new types.CustomRegExp(regexp)
   }
 }
-delete mockRegExpOptions.tag
 delete mockRegExpOptions.predicate
 const RegExp__string = new yaml.Type('!regexp', mockRegExpOptions)
 
 // ----------- //
-CUSTOM_TAGS = yaml.Schema.create([
+CUSTOM_TAGS = yaml.DEFAULT_SCHEMA.extend([
+  ...jsTypes.all,
   Any__string,
   Chance__string,
   Get__string,
