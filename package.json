@@ -39,7 +39,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "argparse": "^1.0.10",
+    "argparse": "^2.0.1",
     "chance": "^1.1.7",
     "chokidar": "^3.4.1",
     "globby": "^11.0.1",

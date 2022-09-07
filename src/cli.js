@@ -5,46 +5,49 @@ const { ArgumentParser } = require('argparse')
 const pkg = require('../package.json')
 
 const cli = new ArgumentParser({
-  addHelp: true,
+  add_help: true,
   prog: 'simpler-mocks',
-  version: pkg.version,
   description: pkg.description
 })
 
-cli.addArgument(['--port', '-p'], {
+cli.add_argument('--port', '-p', {
   type: 'int',
-  defaultValue: process.env.MOCKS_PORT || 0,
+  default: process.env.MOCKS_PORT || 0,
   help: 'The port to run the server on. Defaults to a random open port if none is set.'
 })
 
-cli.addArgument(['--silent', '-s'], {
-  action: 'storeTrue',
+cli.add_argument('--silent', '-s', {
+  action: 'store_true',
   help: 'Hides http access logs from the terminal.'
 })
 
-cli.addArgument(['--verbose', '-vv'], {
-  action: 'storeTrue',
+cli.add_argument('--verbose', '-vv', {
+  action: 'store_true',
   help: 'Shows more informational console logs.'
 })
 
-cli.addArgument(['--watch', '-w'], {
-  action: 'storeTrue',
+cli.add_argument('--watch', '-w', {
+  action: 'store_true',
   help: 'Watch the base directory for changes'
 })
 
-cli.addArgument(['--nodelays', '-n'], {
-  action: 'storeTrue',
+cli.add_argument('--nodelays', '-n', {
+  action: 'store_true',
   help: 'Ignores all delay settings in the mocks'
 })
 
-cli.addArgument(['directory'], {
+cli.add_argument('directory', {
   nargs: '?',
-  defaultValue: './',
-  help:
-    'The directory where mock api definition files are located. Glob syntax supported. Defaults to the current working directory.'
+  default: './',
+  help: 'The directory where mock api definition files are located. Glob syntax supported. Defaults to the current working directory.'
 })
 
-const args = cli.parseArgs()
+cli.add_argument('-v', '--version', {
+  action: 'version',
+  version: `Version: ${pkg.version}`
+})
+
+const args = cli.parse_args()
 const mocksDirectory = path.resolve(process.cwd(), args.directory)
 
 // start the app
