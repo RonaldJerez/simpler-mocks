@@ -95,21 +95,26 @@ class CustomRegExp extends CustomType {
 }
 
 class Save extends CustomType {
-  constructor(keys, value) {
-    value = value || new Any()
+  constructor(keys, tester, staticVal, optional = false) {
+    tester = tester || new Any()
 
-    super(value)
+    super(tester)
     this.keys = keys
+    this.staticVal = staticVal
+    this.optional = optional
   }
 
-  test(value) {
-    const result = tester(value, this.data)
+  test(requestInput) {
+    const result = tester(requestInput, this.data)
 
     if (result) {
       // found a match, save it to the temp storage
       // the server code is responsible for storing it to a permenent location
-      const isCustomType = this.data instanceof CustomType
-      const dataToStore = isCustomType ? this.data : result
+      let dataToStore = this.staticVal
+      if (!dataToStore) {
+        const isCustomType = this.data instanceof CustomType
+        dataToStore = isCustomType ? this.data : result
+      }
 
       if (Array.isArray(this.keys)) {
         this.keys.forEach((key, index) => {
@@ -120,7 +125,7 @@ class Save extends CustomType {
       }
     }
 
-    return result
+    return this.optional || result
   }
 }
 
@@ -157,17 +162,24 @@ class StoredIndexItem extends CustomType {
 }
 
 class Get extends CustomType {
-  constructor(key, defaultVal) {
+  constructor(key, defaultVal, once = false) {
     super()
     this.key = key
     this.default = defaultVal
+    this.once = once
   }
 
   _retrieveFromCache(json) {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
-    let item = cache._storage[this.key] || cache.storage[this.key]
-    let value = this._getValue(item, json) || this._getValue(this.default, json)
+    this.item = this.item || cache._storage[this.key] || cache.storage[this.key]
+    let value = this._getValue(this.item || this.default, json)
+
+    if (this.once) {
+      delete cache._storage[this.key]
+      delete cache.storage[this.key]
+    }
+
     return value || null
   }
 
@@ -190,6 +202,7 @@ class Get extends CustomType {
   }
 
   valueOf() {
+    // TODO: valueOf of should not remove from cache
     return this._retrieveFromCache()
   }
 
@@ -224,16 +237,18 @@ class Random {
  * Checks a value against a particular type
  * NOTE: The signature must remain as this is used for lodash's isEqual and isMatch methods
  *
- * @param {*} val the value we got from the request
- * @param {*} tester the tester (regexp or function)
+ * @param {*} inputVal the value we got from the request
+ * @param {*} referenceVal the tester (regexp or function)
  */
-function tester(value, tester) {
-  if (tester instanceof CustomType) {
-    return tester.test(value)
-  } else if (tester instanceof RegExp) {
-    return tester.test(value)
-  } else if (typeof tester === 'function') {
-    return tester(value)
+function tester(inputVal, referenceVal) {
+  if (referenceVal instanceof CustomType) {
+    return referenceVal.test(inputVal)
+  } else if (referenceVal instanceof RegExp) {
+    return referenceVal.test(inputVal)
+  } else if (typeof referenceVal === 'function') {
+    return referenceVal(inputVal)
+  } else if (typeof referenceVal === 'string') {
+    return inputVal === referenceVal
   }
 }
 

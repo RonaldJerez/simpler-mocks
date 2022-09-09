@@ -9,6 +9,10 @@ const types = require('./types')
 
 let CUSTOM_TAGS
 
+const ONCE = 'once'
+const OPTIONAL = 'optional'
+const WHEN = 'when'
+
 // Example Custom Type
 // https://github.com/nodeca/js-yaml/blob/master/examples/custom_types.js
 // kind: scalar = string, sequence = array, mapping = object
@@ -191,10 +195,13 @@ const Save__string = new yaml.Type('!save', {
  */
 const Save__object = new yaml.Type('!save', {
   kind: 'mapping',
+  multi: true,
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
-  construct: (data) => {
+  construct: (data, type) => {
+    const [tag, ...options] = type.split('.')
+
     const [key] = Object.keys(data)
-    return new types.Save(key, data[key])
+    return new types.Save(key, data[key], undefined, options.includes(OPTIONAL))
   }
 })
 
@@ -218,11 +225,41 @@ const Save__object = new yaml.Type('!save', {
  */
 const Save__array = new yaml.Type('!save', {
   kind: 'sequence',
+  multi: true,
   resolve: (data) => data && data.length > 1, // need a key and a matcher
-  construct: (data) => {
+  construct: (data, type) => {
+    const [tag, ...options] = type.split('.')
+
     const value = data.pop()
     const key = data.length == 1 ? data[0] : data
-    return new types.Save(key, value)
+    return new types.Save(key, value, undefined, options.includes(OPTIONAL))
+  }
+})
+
+/**
+ * Stores static data if the request meets certain creteria
+ * Saves the data under the given key only if the matcher returns true
+ *
+ * format: !set { key: matcher }
+ *
+ * @example
+ * ```yaml
+ * name: !set { has_name: yes, when: !any string }
+ * ```
+ */
+const Set__object = new yaml.Type('!set', {
+  kind: 'mapping',
+  multi: true,
+  resolve: (data) => {
+    const keys = Object.keys(data)
+    return data && keys.length === 2 && keys.includes(WHEN)
+  },
+  construct: (data, type) => {
+    const [tag, ...options] = type.split('.')
+
+    const keys = Object.keys(data)
+    const key = keys.filter((val) => val !== WHEN)[0]
+    return new types.Save(key, data[WHEN], data[key], options.includes(OPTIONAL))
   }
 })
 
@@ -239,9 +276,12 @@ const Save__array = new yaml.Type('!save', {
  */
 const Get__string = new yaml.Type('!get', {
   kind: 'scalar',
+  multi: true,
   resolve: (key) => key && typeof key === 'string',
-  construct: (key) => {
-    return new types.Get(key)
+  construct: (key, type) => {
+    const [tag, ...options] = type.split('.')
+
+    return new types.Get(key, undefined, options.includes(ONCE))
   }
 })
 
@@ -258,10 +298,13 @@ const Get__string = new yaml.Type('!get', {
  */
 const Get__object = new yaml.Type('!get', {
   kind: 'mapping',
+  multi: true,
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
-  construct: (data) => {
+  construct: (data, type) => {
+    const [tag, ...options] = type.split('.')
+
     const [key] = Object.keys(data)
-    return new types.Get(key, data[key])
+    return new types.Get(key, data[key], options.includes(ONCE))
   }
 })
 
@@ -295,6 +338,7 @@ CUSTOM_TAGS = yaml.DEFAULT_SCHEMA.extend([
   Request__string,
   Save__array,
   Save__string,
-  Save__object
+  Save__object,
+  Set__object
 ])
 module.exports = CUSTOM_TAGS

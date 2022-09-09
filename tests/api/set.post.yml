@@ -1,0 +1,5 @@
+- :conditions:
+    body:
+      zipcode: !set.optional { hasZip: 'yes', when: '1111' }
+  :response:
+    with_zip: !get.once { hasZip: 'no' }
