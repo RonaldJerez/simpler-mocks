@@ -9,6 +9,22 @@ const koa = new Koa()
 const router = new Router()
 let skipDelays = false
 
+// adds a route so that the cache store can be cleared
+router.get('/simpler-mocks/reset-store', (ctx) => {
+  ctx.type = 'html'
+  ctx.body = 'Store cleared. ✅<br /><br />'
+
+  if (Object.keys(cache.storage).length) {
+    ctx.body += "<p style='text-decoration: underline'>Previously stored values</p>"
+    for (key in cache.storage) {
+      ctx.body += `<b>${key}:</b> ${cache.storage[key]}<br />`
+    }
+    cache.storage = {}
+  }
+
+  return
+})
+
 // catch all requests
 router.all('(.*)', async (ctx, next) => {
   const start = Date.now()
