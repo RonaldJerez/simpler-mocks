@@ -9,7 +9,6 @@ const types = require('./types')
 
 let CUSTOM_TAGS
 
-const ONCE = 'once'
 const OPTIONAL = 'optional'
 const WHEN = 'when'
 
@@ -91,9 +90,7 @@ const Request__string = new yaml.Type('!request', {
 const Random__string = new yaml.Type('!random', {
   kind: 'scalar',
   resolve: (name) => name,
-  construct: (name) => {
-    return new types.Random(name)
-  }
+  construct: (name) => new types.Random(name)
 })
 
 /**
@@ -177,9 +174,7 @@ const Any__string = new yaml.Type('!any', {
 const Save__string = new yaml.Type('!save', {
   kind: 'scalar',
   resolve: (key) => key && typeof key === 'string',
-  construct: (key) => {
-    return new types.Save(key)
-  }
+  construct: (key) => new types.Save(key)
 })
 
 /**
@@ -278,11 +273,7 @@ const Get__string = new yaml.Type('!get', {
   kind: 'scalar',
   multi: true,
   resolve: (key) => key && typeof key === 'string',
-  construct: (key, type) => {
-    const [tag, ...options] = type.split('.')
-
-    return new types.Get(key, undefined, options.includes(ONCE))
-  }
+  construct: (key) => new types.Get(key)
 })
 
 /**
@@ -300,11 +291,48 @@ const Get__object = new yaml.Type('!get', {
   kind: 'mapping',
   multi: true,
   resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
-  construct: (data, type) => {
-    const [tag, ...options] = type.split('.')
-
+  construct: (data) => {
     const [key] = Object.keys(data)
-    return new types.Get(key, data[key], options.includes(ONCE))
+    return new types.Get(key, data[key])
+  }
+})
+
+/**
+ * Retrieves and removes from storage the value of data that has been persisted using !save
+ * If nothing has been saved under that key it returns null
+ *
+ * format: !pull key
+ *
+ * @example
+ * ```yaml
+ * name: !pull firstname
+ * ```
+ */
+const Pull__string = new yaml.Type('!pull', {
+  kind: 'scalar',
+  multi: true,
+  resolve: (key) => key && typeof key === 'string',
+  construct: (key) => new types.Get(key, undefined, true)
+})
+
+/**
+ * Retrieves and removes from storage the value of data that has been persisted using !save
+ * Retrieves the given key or defaults to the given value if nothing has been saved
+ *
+ * format: !pull key: default
+ *
+ * @example
+ * ```yaml
+ * name: !pull firstname: john
+ * ```
+ */
+const Pull__object = new yaml.Type('!pull', {
+  kind: 'mapping',
+  multi: true,
+  resolve: (data) => data && Object.keys(data).length === 1, // can only have one key
+  construct: (data) => {
+    const [key] = Object.keys(data)
+    return new types.Get(key, data[key], true)
   }
 })
 
@@ -331,6 +359,8 @@ CUSTOM_TAGS = yaml.DEFAULT_SCHEMA.extend([
   Get__string,
   Get__object,
   Include__string,
+  Pull__object,
+  Pull__string,
   Random__array,
   Random__object,
   Random__string,

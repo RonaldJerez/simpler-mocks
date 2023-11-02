@@ -162,11 +162,11 @@ class StoredIndexItem extends CustomType {
 }
 
 class Get extends CustomType {
-  constructor(key, defaultVal, once = false) {
+  constructor(key, defaultVal, pull = false) {
     super()
     this.key = key
     this.default = defaultVal
-    this.once = once
+    this.pull = pull
   }
 
   _retrieveFromCache(json) {
@@ -175,7 +175,7 @@ class Get extends CustomType {
     this.item = this.item || cache._storage[this.key] || cache.storage[this.key]
     let value = this._getValue(this.item || this.default, json)
 
-    if (this.once) {
+    if (this.pull) {
       delete cache._storage[this.key]
       delete cache.storage[this.key]
     }
