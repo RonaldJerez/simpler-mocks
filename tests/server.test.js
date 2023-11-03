@@ -271,4 +271,14 @@ describe('Data persistance', () => {
 
   test('check conditions against saved data', () =>
     request(server).get('/api/get?zip=12345').expect(201))
+
+  test('returns default when a regexp group does not match', () =>
+    request(server)
+      .get('/api/get?locale=sp')
+      .expect(200, { languageCode: 'sp', countryCode: 'US' }))
+
+  test('returns all data when a regexp group does match', () =>
+    request(server)
+      .get('/api/get?locale=sp-SP')
+      .expect(200, { languageCode: 'sp', countryCode: 'SP' }))
 })

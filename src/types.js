@@ -173,7 +173,7 @@ class Get extends CustomType {
     // gets an item from storage
     // temp storage (current session) first, then the persisted storage
     this.item = this.item || cache._storage[this.key] || cache.storage[this.key]
-    let value = this._getValue(this.item || this.default, json)
+    let value = this._getValue(this.item, json) || this._getValue(this.default, json)
 
     if (this.pull) {
       delete cache._storage[this.key]

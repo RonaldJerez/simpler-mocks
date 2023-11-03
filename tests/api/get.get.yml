@@ -23,3 +23,14 @@
     query:
       zip: !get zip
   :status: 201
+
+# Testing getting a default value when a regexp group is undefined
+- :conditions:
+    query:
+      locale: !save
+        - languageCode
+        - countryCode
+        - !regexp '([a-z]{2})(?:\W([A-Z]{2}))?'
+  :response:
+    languageCode: !get { languageCode: 'en' }
+    countryCode: !get { countryCode: 'US' }
